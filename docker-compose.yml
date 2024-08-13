@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+    miniflux_ai:
+        container_name: miniflux_ai
+        image: ghcr.io/qetesh/miniflux_ai:latest
+        restart: always
+        environment:
+            TZ: Asia/Shanghai
+        env_file:
+            - .env

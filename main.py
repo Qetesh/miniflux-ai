@@ -1,4 +1,6 @@
 import os
+import time
+
 from openai import OpenAI
 import miniflux
 from markdownify import markdownify as md
@@ -85,5 +87,7 @@ def process_entry(entry):
         miniflux_client.update_entry(entry['id'], content='摘要：' + llm_result + '<hr><br />' + entry['content'])
     return None
 
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    futures = [executor.submit(process_entry, i) for i in entries['entries']]
+while True:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_entry, i) for i in entries['entries']]
+    time.sleep(60)
