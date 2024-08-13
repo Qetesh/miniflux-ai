@@ -15,9 +15,6 @@ llm_model = os.getenv('llm_model')
 miniflux_client = miniflux.Client(miniflux_base_url, api_key=miniflux_api_key)
 llm_client = OpenAI(base_url=llm_base_url, api_key=llm_api_key)
 
-# Fetch entries with status unread
-entries = miniflux_client.get_entries(status=['unread'], limit=10000)
-
 def process_entry(entry):
     if not entry['content'].startswith('摘要'):
         completion = llm_client.chat.completions.create(
@@ -88,6 +85,9 @@ def process_entry(entry):
     return None
 
 while True:
+    # Fetch entries with status unread
+    entries = miniflux_client.get_entries(status=['unread'], limit=10000)
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(process_entry, i) for i in entries['entries']]
     time.sleep(60)
