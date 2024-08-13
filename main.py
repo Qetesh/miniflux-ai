@@ -6,8 +6,8 @@ import miniflux
 from markdownify import markdownify as md
 import concurrent.futures
 
-miniflux_base_url = os.getenv('base_url')
-miniflux_api_key = os.getenv('api_key')
+miniflux_base_url = os.getenv('miniflux_base_url')
+miniflux_api_key = os.getenv('miniflux_api_key')
 llm_base_url = os.getenv('llm_base_url')
 llm_api_key = os.getenv('llm_api_key')
 llm_model = os.getenv('llm_model')
