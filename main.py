@@ -11,12 +11,13 @@ miniflux_api_key = os.getenv('miniflux_api_key')
 llm_base_url = os.getenv('llm_base_url')
 llm_api_key = os.getenv('llm_api_key')
 llm_model = os.getenv('llm_model')
+feed_blacklist = os.getenv('feed_blacklist').split(',')
 
 miniflux_client = miniflux.Client(miniflux_base_url, api_key=miniflux_api_key)
 llm_client = OpenAI(base_url=llm_base_url, api_key=llm_api_key)
 
 def process_entry(entry):
-    if not entry['content'].startswith('摘要'):
+    if (not entry['content'].startswith('摘要')) & (entry['feed']['site_url'] not in feed_blacklist):
         completion = llm_client.chat.completions.create(
             model=llm_model,
             messages=[
