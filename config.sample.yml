@@ -10,7 +10,7 @@ llm:
 agents:
   summary:
     title: "💡AI 摘要"
-    prompt: "Please summarize the content of the article in 50 words in Chinese.  Do not add any explanations or annotations to the result text. 请用 50 个字的中文总结文章的内容。"
+    prompt: "Please summarize the content of the article under 50 words in Chinese. Do not add any additional Character、markdown language to the result text. 请用不超过50个汉字概括文章内容。结果文本中不要添加任何额外的字符、Markdown语言。"
     style_block: true
     blacklist:
       - https://xxxx.net
