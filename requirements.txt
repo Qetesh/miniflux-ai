@@ -1,3 +1,4 @@
-miniflux~=1.0.1
-openai~=1.40.3
-markdownify~=0.13.1
+miniflux
+openai
+markdownify
+PyYAML

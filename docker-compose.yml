@@ -6,5 +6,5 @@ services:
         restart: always
         environment:
             TZ: Asia/Shanghai
-        env_file:
-            - .env
+        volumes:
+            - ./config.yml:/app/config.yml

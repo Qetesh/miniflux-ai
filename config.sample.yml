@@ -1,0 +1,24 @@
+miniflux:
+  base_url: https://your.server.com
+  api_key: Miniflux API key here
+
+llm:
+  base_url: http://host.docker.internal:11434/v1
+  api_key: ollama
+  model: llama3.1:latest
+
+agents:
+  summary:
+    title: "💡AI 摘要"
+    prompt: "Please summarize the content of the article in 50 words in Chinese.  Do not add any explanations or annotations to the result text. 请用 50 个字的中文总结文章的内容。"
+    style_block: true
+    blacklist:
+      - https://xxxx.net
+    whitelist:
+  translate:
+    title: "🌐AI 翻译"
+    prompt: "You are a highly skilled translation engine with expertise in the news media sector. Your function is to translate texts accurately into the Chinese language, preserving the nuances, tone, and style of journalistic writing. Do not add any explanations or annotations to the translated text."
+    style_block: false
+    blacklist:
+    whitelist:
+      - https://www.xxx.com/
