@@ -1,13 +1,13 @@
 # miniflux-ai
 Miniflux with AI
 
-This project fetches RSS subscription content from Miniflux via API and utilizes a large language model (LLM) to generate summaries, translations, etc. The configuration file allows for easy customization and addition of LLM agents.
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/472306c8-cdd2-4325-8655-04ba7e6045e5">
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/ae99a06f-47b4-4de7-9373-4b82f5102b7e">
-  <img alt="miniflux UI" src="https://github.com/user-attachments/assets/ae99a06f-47b4-4de7-9373-4b82f5102b7e" width="400" > 
+  <img align="right" alt="miniflux UI" src="https://github.com/user-attachments/assets/ae99a06f-47b4-4de7-9373-4b82f5102b7e" width="400" > 
 </picture>
+
+This project fetches RSS subscription content from Miniflux via API and utilizes a large language model (LLM) to generate summaries, translations, etc. The configuration file allows for easy customization and addition of LLM agents.
 
 ## Features
 
