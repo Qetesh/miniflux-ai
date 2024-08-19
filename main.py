@@ -47,7 +47,7 @@ while True:
     start_time = time.time()
     print(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime()), 'Fetched unread entries: ' + str(len(entries['entries']))) if len(entries['entries']) > 0 else print(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime()), 'No new entries')
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         futures = [executor.submit(process_entry, i) for i in entries['entries']]
         for future in concurrent.futures.as_completed(futures):
             try:
