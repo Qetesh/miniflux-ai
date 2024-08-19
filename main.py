@@ -27,7 +27,7 @@ def process_entry(entry):
                 (((agent[1]['whitelist'] is not None) and (entry['feed']['site_url'] in agent[1]['whitelist'])) or
                  (agent[1]['blacklist'] is not None and entry['feed']['site_url'] not in agent[1]['blacklist']) or
                  (agent[1]['whitelist'] is None and agent[1]['blacklist'] is None))):
-            completion = llm_client.chat.completions.create( model=config['llm']['model'], messages= messages, timeout=60 )
+            completion = llm_client.chat.completions.create( model=config['llm']['model'], messages= messages, timeout=15 )
             response_content = completion.choices[0].message.content
             print(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime()), agent[0], entry['feed']['feed_url'], response_content)
 
