@@ -28,11 +28,14 @@ This project fetches RSS subscription content from Miniflux via API and utilizes
 The repository includes a template configuration file: `config.sample.yml`. Modify the `config.yml` to set up:
 
 - **Miniflux**: Base URL and API key.
-- **LLM**: Model settings, API key, and endpoint.
-- **Agents**: Define each agent's prompt, whitelist/blacklist filters, and output style（`style_block` parameter controls whether the output is formatted as a code block in Markdown）.
+- **LLM**: Model settings, API key, and endpoint.Add timeout, max_workers parameters due to multithreading
+- **Agents**: Define each agent's prompt, allow_list/deny_list filters, and output style（`style_block` parameter controls whether the output is formatted as a code block in Markdown）.
 
 Example `config.yml`:
 ```yaml
+# INFO、DEBUG、WARN、ERROR
+log_level: "INFO"
+
 miniflux:
   base_url: https://your.server.com
   api_key: Miniflux API key here
@@ -41,21 +44,24 @@ llm:
   base_url: http://host.docker.internal:11434/v1
   api_key: ollama
   model: llama3.1:latest
+#  timeout: 60
+#  max_workers: 4
 
 agents:
   summary:
     title: "💡AI 摘要"
     prompt: "Please summarize the content of the article under 50 words in Chinese. Do not add any additional Character、markdown language to the result text. 请用不超过50个汉字概括文章内容。结果文本中不要添加任何额外的字符、Markdown语言。"
     style_block: true
-    blacklist:
+    deny_list:
       - https://xxxx.net
-    whitelist:
+    allow_list:
+
   translate:
     title: "🌐AI 翻译"
     prompt: "You are a highly skilled translation engine with expertise in the news media sector. Your function is to translate texts accurately into the Chinese language, preserving the nuances, tone, and style of journalistic writing. Do not add any explanations or annotations to the translated text."
     style_block: false
-    blacklist:
-    whitelist:
+    deny_list:
+    allow_list:
       - https://www.xxx.com/
 ```
 
