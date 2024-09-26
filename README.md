@@ -49,7 +49,7 @@ llm:
 
 agents:
   summary:
-    title: "💡AI 摘要"
+    title: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17.777 14.283" width="17.777" height="14.283"> <style> path { fill: #4b4b4b; } @media (prefers-color-scheme: dark) { path { fill: #d0d0d0; } } </style> <g fill="#d0d0d0" fill-opacity="1" transform="translate(2.261,-1.754)"> <path d="M-2.261 3.194v6.404c0 1.549 0.957 4.009 4.328 4.188h9.224l0.061 1.315c0.04 0.882 0.663 1.222 1.205 0.666l2.694-2.356c0.353-0.349 0.353-0.971 0-1.331L12.518 10.047c-0.525-0.524-1.205-0.196-1.205 0.665v1.091H2.257c-0.198 0-2.546 0.221-2.546-2.911V3.194c0-0.884-0.362-1.44-0.99-1.44-1.106 0-0.956 1.439-0.982 1.44z"/> </g> <path d="M5.679 1.533h8.826c0.421 0 0.753-0.399 0.755-0.755 0.002-0.36-0.373-0.774-0.755-0.774H5.679c-0.536 0-0.781 0.4-0.781 0.764 0 0.418 0.289 0.764 0.781 0.764zm0 4.693h4.502c0.421 0 0.682-0.226 0.717-0.742 0.03-0.44-0.335-0.787-0.717-0.787H5.679c-0.402 0-0.763 0.214-0.781 0.71-0.019 0.535 0.379 0.818 0.781 0.818z" fill="#d0d0d0"/> </svg> AI 摘要'
     prompt: "Please summarize the content of the article under 50 words in Chinese. Do not add any additional Character、markdown language to the result text. 请用不超过50个汉字概括文章内容。结果文本中不要添加任何额外的字符、Markdown语言。"
     style_block: true
     deny_list:
@@ -93,6 +93,11 @@ docker-compose up -d
 1. Ensure `config.yml` is properly configured.
 2. Run the script: `python main.py`
 3. The script will fetch unread RSS entries, process them with the LLM, and update the content in Miniflux.
+
+## Roadmap
+- [ ] Add daily summary(by title, Summary of existing AI)
+  - [ ] Add Morning and Evening News（e.g. 9/24: AI Morning News, 9/24: AI Evening News）
+  - [ ] Add timed summary
 
 ## Contributing
 
