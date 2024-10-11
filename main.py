@@ -1,7 +1,8 @@
 import concurrent.futures
 import time
-import logging
 import traceback
+from common.logger import logger
+from core.entry_filter import filter_entry
 
 import miniflux
 from markdownify import markdownify as md
@@ -13,33 +14,16 @@ config = safe_load(open('config.yml', encoding='utf8'))
 miniflux_client = miniflux.Client(config['miniflux']['base_url'], api_key=config['miniflux']['api_key'])
 llm_client = OpenAI(base_url=config['llm']['base_url'], api_key=config['llm']['api_key'])
 
-logger = logging.getLogger(__name__)
-logger.setLevel(config.get('log_level', 'INFO'))
-formatter = logging.Formatter('%(asctime)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s')
-console = logging.StreamHandler()
-console.setFormatter(formatter)
-logger.addHandler(console)
-
 def process_entry(entry):
     llm_result = ''
-    start_with_list = [name[1]['title'] for name in config['agents'].items()]
-    style_block = [name[1]['style_block'] for name in config['agents'].items()]
-    [start_with_list.append('<pre') for i in style_block if i]
 
     for agent in config['agents'].items():
-        # Todo Compatible with whitelist/blacklist parameter, to be removed
-        allow_list = agent[1].get('allow_list') if agent[1].get('allow_list') is not None else agent[1].get('whitelist')
-        deny_list = agent[1]['deny_list'] if agent[1].get('deny_list') is not None else agent[1].get('blacklist')
-
         messages = [
             {"role": "system", "content": agent[1]['prompt']},
             {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content']) }
         ]
         # filter, if AI is not generating, and in allow_list, or not in deny_list
-        if ((not entry['content'].startswith(tuple(start_with_list))) and
-                (((allow_list is not None) and (entry['feed']['site_url'] in allow_list)) or
-                 (deny_list is not None and entry['feed']['site_url'] not in deny_list) or
-                 (allow_list is None and deny_list is None))):
+        if filter_entry(config, agent, entry):
             completion = llm_client.chat.completions.create(
                 model=config['llm']['model'],
                 messages= messages,
@@ -47,7 +31,7 @@ def process_entry(entry):
             )
 
             response_content = completion.choices[0].message.content
-            logger.info(f"\nagents:{agent[0]} \nfeed_title:{entry['title']} \nresult:{response_content}")
+            logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
 
             if agent[1]['style_block']:
                 llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'
