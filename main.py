@@ -6,7 +6,7 @@ import schedule
 from common import Config, logger
 
 config = Config()
-from app import app
+from myapp import app
 from core import fetch_unread_entries
 
 miniflux_client = miniflux.Client(config.miniflux_base_url, api_key=config.miniflux_api_key)

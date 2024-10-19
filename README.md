@@ -103,6 +103,10 @@ docker-compose up -d
 
 Feel free to fork this repository and submit pull requests. Contributions are welcome!
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Qetesh/miniflux-ai&type=Date)](https://star-history.com/#Qetesh/miniflux-ai&Date)
+
 ## License
 
 This project is licensed under the MIT License.

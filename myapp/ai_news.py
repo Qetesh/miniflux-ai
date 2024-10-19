@@ -1,7 +1,7 @@
 from flask import jsonify
 
-from app import app
-# app = Flask(__name__)
+from myapp import app
+# myapp = Flask(__name__)
 
 @app.route('/rss/ai-summary', methods=['GET'])
 def miniflux_ai_summary(miniflux_client):

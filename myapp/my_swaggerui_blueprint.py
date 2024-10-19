@@ -1,5 +1,5 @@
 from flasgger import Swagger
-from app import app
+from myapp import app
 
 app.config['SWAGGER'] = {
     'title': 'miniflux-AI API',
