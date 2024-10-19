@@ -1,0 +1,44 @@
+import markdown
+from markdownify import markdownify as md
+from openai import OpenAI
+
+from common.config import Config
+from common.logger import logger
+from core.entry_filter import filter_entry
+
+config = Config()
+llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
+
+def process_entry(miniflux_client, entry):
+    llm_result = ''
+    start_with_list = [name[1]['title'] for name in config.agents.items()]
+    style_block = [name[1]['style_block'] for name in config.agents.items()]
+    [start_with_list.append('<pre') for i in style_block if i]
+
+    for agent in config.agents.items():
+        messages = [
+            {"role": "system", "content": agent[1]['prompt']},
+            {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content']) }
+        ]
+
+        # filter, if AI is not generating, and in allow_list, or not in deny_list
+        if filter_entry(config, agent, entry):
+            completion = llm_client.chat.completions.create(
+                model=config.llm_model,
+                messages= messages,
+                timeout=config.llm_timeout
+            )
+
+            response_content = completion.choices[0].message.content
+            logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
+
+            if agent[1]['style_block']:
+                llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'
+                              + agent[1]['title'] + '：'
+                              + response_content.replace('\n', '').replace('\r', '')
+                              + '\n</code></pre><hr><br />')
+            else:
+                llm_result = llm_result + f"{agent[1]['title']}：{markdown.markdown(response_content)}<hr><br />"
+
+    if len(llm_result) > 0:
+        dict_result = miniflux_client.update_entry(entry['id'], content= llm_result + entry['content'])
