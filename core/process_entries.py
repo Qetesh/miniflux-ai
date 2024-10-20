@@ -16,13 +16,19 @@ def process_entry(miniflux_client, entry):
     [start_with_list.append('<pre') for i in style_block if i]
 
     for agent in config.agents.items():
-        messages = [
-            {"role": "system", "content": agent[1]['prompt']},
-            {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content']) }
-        ]
-
         # filter, if AI is not generating, and in allow_list, or not in deny_list
         if filter_entry(config, agent, entry):
+            if '${content}' in agent[1]['prompt']:
+                messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": agent[1]['prompt'].replace('${content}', md(entry['content']))}
+                ]
+            else:
+                messages = [
+                    {"role": "system", "content": agent[1]['prompt']},
+                    {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content'])}
+                ]
+
             completion = llm_client.chat.completions.create(
                 model=config.llm_model,
                 messages= messages,

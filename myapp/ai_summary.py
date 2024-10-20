@@ -47,8 +47,9 @@ def miniflux_ai():
                 for future in concurrent.futures.as_completed(futures):
                     try:
                         data = future.result()
-                        return jsonify(data), 200
                     except Exception as e:
                         logger.error(traceback.format_exc())
                         logger.error('generated an exception: %s' % e)
                         return 500
+
+        return jsonify({'status': 'ok'})

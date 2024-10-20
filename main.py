@@ -12,7 +12,8 @@ from core import fetch_unread_entries
 miniflux_client = miniflux.Client(config.miniflux_base_url, api_key=config.miniflux_api_key)
 
 def my_schedule():
-    schedule.every(1).minutes.do(fetch_unread_entries, config, miniflux_client)
+    interval = 15 if config.miniflux_webhook_secret else 1
+    schedule.every(interval).minutes.do(fetch_unread_entries, config, miniflux_client)
     schedule.run_all()
 
     while True:
