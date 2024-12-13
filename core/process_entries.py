@@ -1,6 +1,8 @@
+import json
 import markdown
 from markdownify import markdownify as md
 from openai import OpenAI
+import threading
 
 from common.config import Config
 from common.logger import logger
@@ -8,8 +10,10 @@ from core.entry_filter import filter_entry
 
 config = Config()
 llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
+file_lock = threading.Lock()
 
 def process_entry(miniflux_client, entry):
+    #Todo change to queue
     llm_result = ''
     start_with_list = [name[1]['title'] for name in config.agents.items()]
     style_block = [name[1]['style_block'] for name in config.agents.items()]
@@ -37,6 +41,19 @@ def process_entry(miniflux_client, entry):
 
             response_content = completion.choices[0].message.content
             logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
+
+            # save for ai_summary
+            if agent[0] == 'summary':
+                entry_list = {'datetime': entry['created_at'], 'category': entry['feed']['category']['title'], 'title': entry['title'], 'content': response_content}
+                with file_lock:
+                    try:
+                        with open('entries.json', 'r') as file:
+                            data = json.load(file)
+                    except (FileNotFoundError, json.JSONDecodeError):
+                        data = []
+                    data.append(entry_list)
+                    with open('entries.json', 'w') as file:
+                        json.dump(data, file, indent=4, ensure_ascii=False)
 
             if agent[1]['style_block']:
                 llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'

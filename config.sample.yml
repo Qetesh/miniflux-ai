@@ -3,14 +3,27 @@ log_level: "INFO"
 
 miniflux:
   base_url: https://your.server.com
-  api_key: Miniflux API key here
+  api_key: Miniflux_API_key_here
+  # webhook_secret: Miniflux_webhook_secret_here
 
 llm:
   base_url: http://host.docker.internal:11434/v1
   api_key: ollama
   model: llama3.1:latest
-#  timeout: 60
-#  max_workers: 4
+  # timeout: 60
+  # max_workers: 4
+
+ai_news:
+  # for docker compose environment, use docker container name
+  url: http://miniflux-ai
+  schedule:
+    - "07:30"
+    - "18:00"
+    - "22:00"
+  prompts:
+    greeting: "Hello, I'm your personal assistant. How can I help you today?"
+    summary: "Please summarize the content of the article under 50 words in Chinese. Do not add any additional Character、markdown language to the result text."
+    summary_block: "Please summarize the content of the article under 50 words in Chinese. Do not add any additional Character、markdown language to the result text."
 
 agents:
   summary:

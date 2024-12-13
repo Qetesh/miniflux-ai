@@ -15,6 +15,10 @@ class Config:
         self.llm_timeout = self.get_config_value('llm', 'timeout', 60)
         self.llm_max_workers = self.get_config_value('llm', 'max_workers', 4)
 
+        self.ai_news_url = self.get_config_value('ai_news', 'url', None)
+        self.ai_news_schedule = self.get_config_value('ai_news', 'schedule', None)
+        self.ai_news_prompts = self.get_config_value('ai_news', 'prompts', None)
+
         self.agents = self.c.get('agents', {})
 
     def get_config_value(self, section, key, default=None):
