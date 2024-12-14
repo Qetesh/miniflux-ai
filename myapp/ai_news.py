@@ -31,7 +31,7 @@ def miniflux_ai_news():
         with open('ai_news.json', 'r') as file:
             ai_news = json.load(file)
     except FileNotFoundError:
-        pass
+        ai_news = ''
     except Exception as e:
         logger.error(e)
 
