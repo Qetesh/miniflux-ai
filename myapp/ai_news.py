@@ -34,7 +34,6 @@ def miniflux_ai_news():
         pass
     except Exception as e:
         logger.error(e)
-        ai_news = []
 
     # 清空 ai_news.json
     with open('ai_news.json', 'w') as file:
