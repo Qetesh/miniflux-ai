@@ -1,63 +1,50 @@
 import concurrent.futures
 import time
 import traceback
-from common.logger import logger
-from core.entry_filter import filter_entry
 
 import miniflux
-from markdownify import markdownify as md
-import markdown
-from openai import OpenAI
-from yaml import safe_load
+import schedule
 
-config = safe_load(open('config.yml', encoding='utf8'))
-miniflux_client = miniflux.Client(config['miniflux']['base_url'], api_key=config['miniflux']['api_key'])
-llm_client = OpenAI(base_url=config['llm']['base_url'], api_key=config['llm']['api_key'])
+from common import Config, logger
+from myapp import app
+from core import fetch_unread_entries, generate_daily_news
 
-def process_entry(entry):
-    llm_result = ''
-
-    for agent in config['agents'].items():
-        messages = [
-            {"role": "system", "content": agent[1]['prompt']},
-            {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content']) }
-        ]
-        # filter, if AI is not generating, and in allow_list, or not in deny_list
-        if filter_entry(config, agent, entry):
-            completion = llm_client.chat.completions.create(
-                model=config['llm']['model'],
-                messages= messages,
-                timeout=config.get('llm', {}).get('timeout', 60)
-            )
-
-            response_content = completion.choices[0].message.content
-            logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
-
-            if agent[1]['style_block']:
-                llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'
-                              + agent[1]['title'] + '：'
-                              + response_content.replace('\n', '').replace('\r', '')
-                              + '\n</code></pre><hr><br />')
-            else:
-                llm_result = llm_result + f"{agent[1]['title']}：{markdown.markdown(response_content)}<hr><br />"
-
-    if len(llm_result) > 0:
-        miniflux_client.update_entry(entry['id'], content= llm_result + entry['content'])
-
+config = Config()
+miniflux_client = miniflux.Client(config.miniflux_base_url, api_key=config.miniflux_api_key)
 while True:
-    entries = miniflux_client.get_entries(status=['unread'], limit=10000)
-    start_time = time.time()
-    logger.info('Fetched unread entries: ' + str(len(entries['entries']))) if len(entries['entries']) > 0 else logger.info('No new entries')
+    try:
+        alive = miniflux_client.me()
+        logger.info('Successfully connected to Miniflux!')
+        break
+    except Exception as e:
+        logger.error('Cannot connect to Miniflux: %s' % e)
+        time.sleep(1)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=config.get('llm', {}).get('max_workers', 4)) as executor:
-        futures = [executor.submit(process_entry, i) for i in entries['entries']]
-        for future in concurrent.futures.as_completed(futures):
+def my_schedule():
+    interval = 15 if config.miniflux_webhook_secret else 1
+    schedule.every(interval).minutes.do(fetch_unread_entries, config, miniflux_client)
+    schedule.run_all()
+
+    if config.ai_news_schedule:
+        feeds = miniflux_client.get_feeds()
+        if not any('Newsᴬᴵ for you' in item['title'] for item in feeds):
             try:
-                data = future.result()
+                miniflux_client.create_feed(category_id=1, feed_url=config.ai_news_url + '/rss/ai-news')
+                logger.info('Successfully created the ai_news feed in Miniflux!')
             except Exception as e:
-                logger.error(traceback.format_exc())
-                logger.error('generated an exception: %s' % e)
+                logger.error('Failed to create the ai_news feed in Miniflux: %s' % e)
+        for ai_schedule in config.ai_news_schedule:
+            schedule.every().day.at(ai_schedule).do(generate_daily_news)
 
-    if len(entries['entries']) > 0 and time.time() - start_time >= 3:
-        logger.info('Done')
-    time.sleep(60)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def my_flask():
+    logger.info('Starting API')
+    app.run(host='0.0.0.0', port=80)
+
+if __name__ == '__main__':
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(my_flask)
+        executor.submit(my_schedule)

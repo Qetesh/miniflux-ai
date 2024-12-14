@@ -3,3 +3,7 @@ openai
 markdownify
 markdown
 PyYAML
+flask
+feedgen
+schedule
+flasgger
