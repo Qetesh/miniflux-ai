@@ -6,6 +6,7 @@ import markdown
 from openai import OpenAI
 from feedgen.feed import FeedGenerator
 
+from common import logger
 from common.config import Config
 from myapp import app
 
@@ -29,8 +30,11 @@ def miniflux_ai_news():
     try:
         with open('ai_news.json', 'r') as file:
             ai_news = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        logger.error(e)
+        ai_news = []
 
     # 清空 ai_news.json
     with open('ai_news.json', 'w') as file:
