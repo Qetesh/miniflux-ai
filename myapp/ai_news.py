@@ -38,22 +38,22 @@ def miniflux_ai_news():
 
 
     fg = FeedGenerator()
-    fg.id('https://ai-news.app')
+    fg.id('https://ai-news.miniflux')
     fg.title('֎Newsᴬᴵ for you')
     fg.subtitle('Powered by miniflux-ai')
     fg.author({'name': 'miniflux-ai'})
-    fg.link(href='https://ai-news.app', rel='self')
+    fg.link(href='https://ai-news.miniflux', rel='self')
 
     fe_welcome = fg.add_entry()
-    fe_welcome.id('https://ai-news.app')
-    fe_welcome.link(href='https://ai-news.app')
+    fe_welcome.id('https://ai-news.miniflux')
+    fe_welcome.link(href='https://ai-news.miniflux')
     fe_welcome.title(f"Welcome to Newsᴬᴵ")
     fe_welcome.description(markdown.markdown('Welcome to Newsᴬᴵ'))
 
     if ai_news:
         fe = fg.add_entry()
-        fe.id('https://ai-news.app' + time.strftime('%Y-%m-%d-%H-%M'))
-        fe.link(href='https://ai-news.app' + time.strftime('%Y-%m-%d-%H-%M'))
+        fe.id('https://ai-news.miniflux' + time.strftime('%Y-%m-%d-%H-%M'))
+        fe.link(href='https://ai-news.miniflux' + time.strftime('%Y-%m-%d-%H-%M'))
         fe.title(f"{'Morning' if datetime.today().hour < 12 else 'Nightly'} Newsᴬᴵ for you - {time.strftime('%Y-%m-%d')}")
         fe.description(markdown.markdown(ai_news))
 
