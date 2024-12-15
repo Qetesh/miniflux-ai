@@ -34,7 +34,7 @@ def my_schedule():
             except Exception as e:
                 logger.error('Failed to create the ai_news feed in Miniflux: %s' % e)
         for ai_schedule in config.ai_news_schedule:
-            schedule.every().day.at(ai_schedule).do(generate_daily_news)
+            schedule.every().day.at(ai_schedule).do(generate_daily_news, miniflux_client)
 
     while True:
         schedule.run_pending()

@@ -9,7 +9,7 @@ from core.get_ai_result import get_ai_result
 config = Config()
 llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
 
-def generate_daily_news():
+def generate_daily_news(miniflux_client):
     logger.info('Generating daily news')
     # fetch entries.json
     try:
@@ -37,4 +37,10 @@ def generate_daily_news():
     with open('ai_news.json', 'w') as f:
         json.dump(response_content, f, indent=4, ensure_ascii=False)
 
-    # Todo trigger miniflux feed update
+    # trigger miniflux feed refresh
+    feeds = miniflux_client.get_feeds()
+    ai_news_feed_id = next((item['id'] for item in feeds if 'Newsᴬᴵ for you' in item['title']), None)
+
+    if ai_news_feed_id:
+        miniflux_client.refresh_feed(ai_news_feed_id)
+        logger.debug('Successfully refreshed the ai_news feed in Miniflux!')
