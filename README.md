@@ -5,9 +5,9 @@ This project fetches RSS subscription content from Miniflux via API and utilizes
 
 ## Features
 
-- **Miniflux Integration**: Seamlessly fetch unread entries from Miniflux.
+- **Miniflux Integration**: Seamlessly fetch unread entries from Miniflux or trigger via webhook.
 - **LLM Processing**: Generate summaries, translations, etc. based on your chosen LLM agent.
-- **AI News**: Generate AI morning/evening news using LLM agents.
+- **AI News**: Use the LLM agent to generate AI morning and evening news from feed content.
 - **Flexible Configuration**: Easily modify or add new agents via the `config.yml` file.
 - **Markdown and HTML Support**: Outputs in Markdown or styled HTML blocks, depending on configuration.
 
@@ -30,7 +30,9 @@ This project fetches RSS subscription content from Miniflux via API and utilizes
     </td>
     <td> 
       <picture>
-
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/a8587d6e-1160-4379-be5e-0b70c57df6de">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/ced4373c-f168-471c-a388-d65e0523cadf">
+        <img alt="miniflux AI summaries translations" src="https://github.com/user-attachments/assets/ced4373c-f168-471c-a388-d65e0523cadf" width="400" > 
       </picture>
     </td>
   </tr>
@@ -46,6 +48,11 @@ This project fetches RSS subscription content from Miniflux via API and utilizes
 ## Configuration
 
 The repository includes a template configuration file: `config.sample.yml`. Modify the `config.yml` to set up:
+
+> If using a webhook, enter the URL in Settings > Integrations > Webhook > Webhook URL.
+> 
+> If deploying in a container alongside Miniflux, use the following URL:
+> http://miniflux_ai/api/miniflux-ai.
 
 - **Miniflux**: Base URL and API key.
 - **LLM**: Model settings, API key, and endpoint.Add timeout, max_workers parameters due to multithreading
