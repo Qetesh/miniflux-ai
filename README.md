@@ -23,9 +23,9 @@ This project fetches RSS subscription content from Miniflux via API and utilizes
   <tr>
     <td> 
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/3acedaee-afe8-4310-955e-f022c886a533">
-        <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/493589e4-d52f-42bb-b5b4-a270e1633f56">
-        <img alt="miniflux AI summaries translations" src="https://github.com/user-attachments/assets/493589e4-d52f-42bb-b5b4-a270e1633f56" width="400" > 
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/11c208d9-816a-4c8c-bc00-2f780529e58d">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/c97e2774-ec10-4acb-bef7-25cf8d43da15">
+        <img alt="miniflux AI summaries translations" src="https://github.com/user-attachments/assets/c97e2774-ec10-4acb-bef7-25cf8d43da15" width="400" > 
       </picture>
     </td>
     <td> 
@@ -95,6 +95,17 @@ docker-compose up -d
 - [x] Add daily summary(by title, Summary of existing AI)
   - [x] Add Morning and Evening News（e.g. 9/24: AI Morning News, 9/24: AI Evening News）
   - [x] Add timed summary
+
+## FAQ
+<details>
+<summary>If the formatting of summary content is incorrect, add the following code in Settings > Custom CSS:</summary>
+```
+pre code {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+```
+</details>
 
 ## Contributing
 
