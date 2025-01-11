@@ -26,7 +26,7 @@ def generate_daily_news(miniflux_client):
     # summary
     summary = get_ai_result(config.ai_news_prompts['summary'], summary_block)
 
-    response_content = greeting + '\n\n### 🌐Summery\n' + summary + '\n\n### 📝News\n' + summary_block
+    response_content = greeting + '\n\n### 🌐Summary\n' + summary + '\n\n### 📝News\n' + summary_block
 
     logger.info('Generated daily news: ' + response_content)
 
