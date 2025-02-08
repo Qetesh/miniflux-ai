@@ -30,9 +30,9 @@ This project integrates with Miniflux to fetch RSS feed content via API or webho
     </td>
     <td> 
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/a8587d6e-1160-4379-be5e-0b70c57df6de">
-        <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/ced4373c-f168-471c-a388-d65e0523cadf">
-        <img alt="miniflux AI summaries translations" src="https://github.com/user-attachments/assets/ced4373c-f168-471c-a388-d65e0523cadf" width="400" > 
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/b40f5bdd-d265-4beb-a14c-d39d6624760b">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/e5985025-15f3-43b0-982b-422575962783">
+        <img alt="miniflux AI summaries translations" src="https://github.com/user-attachments/assets/e5985025-15f3-43b0-982b-422575962783" width="400" > 
       </picture>
     </td>
   </tr>
@@ -67,7 +67,6 @@ The project includes a `docker-compose.yml` file for easy deployment:
 > If using webhook or AI news, it is recommended to use the same docker-compose.yml with miniflux and access it via container name.
 
 ```yaml
-version: '3.3'
 services:
     miniflux_ai:
         container_name: miniflux_ai
@@ -110,6 +109,11 @@ pre code {
 ## Contributing
 
 Feel free to fork this repository and submit pull requests. Contributions and issues are welcome!
+
+<a href="https://github.com/Qetesh/miniflux-ai/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Qetesh/miniflux-ai" />
+</a>
+
 
 ## Star History
 

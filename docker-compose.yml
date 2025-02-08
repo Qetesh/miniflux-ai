@@ -1,10 +1,38 @@
-version: '3.3'
 services:
-    miniflux_ai:
-        container_name: miniflux_ai
-        image: ghcr.io/qetesh/miniflux-ai:latest
-        restart: always
-        environment:
-            TZ: Asia/Shanghai
-        volumes:
-            - ./config.yml:/app/config.yml
+  miniflux:
+    image: miniflux/miniflux:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "80:8080"
+    environment:
+      - DATABASE_URL=postgres://miniflux:secret@db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=test123
+    restart: unless-stopped
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=miniflux
+    volumes:
+      - miniflux-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "miniflux"]
+      interval: 10s
+      start_period: 30s
+    restart: unless-stopped
+
+  # miniflux-ai
+  miniflux_ai:
+    container_name: miniflux_ai
+    image: ghcr.io/qetesh/miniflux-ai:latest
+    restart: unless-stopped
+    environment:
+        TZ: Asia/Shanghai
+    volumes:
+        - ./config.yml:/app/config.yml
