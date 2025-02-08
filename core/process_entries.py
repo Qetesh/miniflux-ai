@@ -57,11 +57,11 @@ def process_entry(miniflux_client, entry):
 
             if agent[1]['style_block']:
                 llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'
-                              + agent[1]['title'] + '：'
+                              + agent[1]['title']
                               + response_content.replace('\n', '').replace('\r', '')
                               + '\n</code></pre><hr><br />')
             else:
-                llm_result = llm_result + f"{agent[1]['title']}：{markdown.markdown(response_content)}<hr><br />"
+                llm_result = llm_result + f"{agent[1]['title']}{markdown.markdown(response_content)}<hr><br />"
 
     if len(llm_result) > 0:
         dict_result = miniflux_client.update_entry(entry['id'], content= llm_result + entry['content'])
