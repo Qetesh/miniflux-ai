@@ -15,9 +15,6 @@ file_lock = threading.Lock()
 def process_entry(miniflux_client, entry):
     #Todo change to queue
     llm_result = ''
-    start_with_list = [name[1]['title'] for name in config.agents.items()]
-    style_block = [name[1]['style_block'] for name in config.agents.items()]
-    [start_with_list.append('<pre') for i in style_block if i]
 
     for agent in config.agents.items():
         # filter, if AI is not generating, and in allow_list, or not in deny_list
