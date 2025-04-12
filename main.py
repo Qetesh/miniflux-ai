@@ -18,7 +18,8 @@ while True:
         break
     except Exception as e:
         logger.error('Cannot connect to Miniflux: %s' % e)
-        time.sleep(1)
+        logger.error(e.args[0].content)
+        time.sleep(3)
 
 def my_schedule():
     interval = 15 if config.miniflux_webhook_secret else 1
