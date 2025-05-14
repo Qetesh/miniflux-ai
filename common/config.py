@@ -14,6 +14,7 @@ class Config:
         self.llm_model = self.get_config_value('llm', 'model', None)
         self.llm_timeout = self.get_config_value('llm', 'timeout', 60)
         self.llm_max_workers = self.get_config_value('llm', 'max_workers', 4)
+        self.llm_RPM = self.get_config_value('llm', 'RPM', 1000)
 
         self.ai_news_url = self.get_config_value('ai_news', 'url', None)
         self.ai_news_schedule = self.get_config_value('ai_news', 'schedule', None)

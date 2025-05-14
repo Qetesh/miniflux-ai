@@ -12,6 +12,7 @@ llm:
   model: llama3.1:latest
   # timeout: 60
   # max_workers: 4
+  # RPM: 15
 
 ai_news:
   # for docker compose environment, use docker container_name

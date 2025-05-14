@@ -2,6 +2,7 @@ import json
 import markdown
 from markdownify import markdownify as md
 from openai import OpenAI
+from ratelimit import limits, sleep_and_retry
 import threading
 
 from common.config import Config
@@ -12,6 +13,8 @@ config = Config()
 llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
 file_lock = threading.Lock()
 
+@sleep_and_retry
+@limits(calls=config.llm_RPM, period=60)
 def process_entry(miniflux_client, entry):
     #Todo change to queue
     llm_result = ''
