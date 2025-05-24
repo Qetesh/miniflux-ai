@@ -11,8 +11,11 @@ llm:
   api_key: ollama
   model: llama3.1:latest
   # timeout: 60
+  # Request per second limit, default 4
   # max_workers: 4
+  # Request per minute(RPM) limit, default 1000
   # RPM: 15
+
 ai_news:
   # for docker compose environment, use docker container_name
   url: http://miniflux_ai
