@@ -24,3 +24,6 @@ class Config:
 
     def get_config_value(self, section, key, default=None):
         return self.c.get(section, {}).get(key, default)
+
+
+config = Config()

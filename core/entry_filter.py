@@ -1,31 +1,84 @@
 import fnmatch
+from typing import Dict, List, Any
 
-def filter_entry(config, agent, entry):
-    start_with_list = [name[1]['title'] for name in config.agents.items()]
-    style_block = [name[1]['style_block'] for name in config.agents.items()]
-    [start_with_list.append('<pre') for i in style_block if i]
+from common.logger import log_entry_debug
 
-    # Todo Compatible with whitelist/blacklist parameter, to be removed
-    allow_list = agent[1].get('allow_list') if agent[1].get('allow_list') is not None else agent[1].get('whitelist')
-    deny_list = agent[1]['deny_list'] if agent[1].get('deny_list') is not None else agent[1].get('blacklist')
 
-    # filter, if not content starts with start flag
-    if not entry['content'].startswith(tuple(start_with_list)):
+def filter_entry(agent: tuple, entry: Dict[str, Any]) -> bool:
+    """
+    Filter entry based on agent configuration and content processing status
+    
+    Args:
+        config: Configuration object containing agents settings
+        agent: Tuple containing agent name and configuration
+        entry: Entry dictionary with content and feed information
+        
+    Returns:
+        True if entry should be processed, False otherwise
+    """
+    agent_name, _ = agent
+    if _is_already_processed(agent, entry):
+        log_entry_debug(entry, agent_name=agent_name, message=f"Already processed, skipping")
+        return False
+    
+    return _should_process_entry(agent, entry)
 
-        # filter, if in allow_list
-        if allow_list is not None:
-            if any(fnmatch.fnmatch(entry['feed']['site_url'], pattern) for pattern in allow_list):
-                return True
 
-        # filter, if not in deny_list
-        elif deny_list is not None:
-            if any(fnmatch.fnmatch(entry['feed']['site_url'], pattern) for pattern in deny_list):
-                return False
-            else:
-                return True
+def _is_already_processed(agent: tuple, entry: Dict[str, Any]) -> bool:
+    """
+    Check if entry has already been processed by this specific agent
+    
+    Args:
+        agent: Tuple containing agent name and configuration
+        entry: Entry dictionary
+        
+    Returns:
+        True if entry is already processed, False otherwise
+    """
+    agent_name, _ = agent
+    marker = f"<div data-ai-agent=\"{agent_name}\" style=\"display: none;\"></div>"
+    
+    return marker in entry['content']
 
-        # filter, if allow_list and deny_list are both None
-        elif allow_list is None and deny_list is None:
-            return True
 
-    return False
+def _should_process_entry(agent: tuple, entry: Dict[str, Any]) -> bool:
+    """
+    Determine if entry should be processed based on allow/deny lists
+    
+    Args:
+        agent: Tuple containing agent name and configuration
+        entry: Entry dictionary
+        
+    Returns:
+        True if entry should be processed, False otherwise
+    """
+    _, agent_config = agent
+    site_url = entry['feed']['site_url']
+    
+    allow_list = agent_config.get('allow_list')
+    deny_list = agent_config.get('deny_list')
+    
+    # If allow list exists, only process entries from allowed sites
+    if allow_list is not None:
+        return _matches_any_pattern(site_url, allow_list)
+    
+    # If deny list exists, process entries except from denied sites
+    if deny_list is not None:
+        return not _matches_any_pattern(site_url, deny_list)
+    
+    # If neither list exists, process all entries
+    return True
+
+
+def _matches_any_pattern(url: str, patterns: List[str]) -> bool:
+    """
+    Check if URL matches any of the given patterns
+    
+    Args:
+        url: URL to check
+        patterns: List of patterns to match against
+        
+    Returns:
+        True if URL matches any pattern, False otherwise
+    """
+    return any(fnmatch.fnmatch(url, pattern) for pattern in patterns)

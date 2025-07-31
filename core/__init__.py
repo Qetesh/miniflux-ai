@@ -1,3 +1,4 @@
-from .fetch_unread_entries import fetch_unread_entries
-from .process_entries import process_entry
-from .generate_daily_news import generate_daily_news
+from .entry_handler import handle_unread_entries, process_entries_concurrently
+from .entry_processor import process_entry
+from .news_generator import generate_daily_news, init_news_feed
+from .miniflux_client import miniflux_client

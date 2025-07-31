@@ -1,64 +1,128 @@
-import json
-from datetime import datetime
 import time
+import traceback
+from datetime import datetime
+
 import markdown
-
-from openai import OpenAI
 from feedgen.feed import FeedGenerator
+from flask import Response
 
-from common import logger
-from common.config import Config
+from common import logger, AI_NEWS_FILE
 from myapp import app
 
-config = Config()
-llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
-
 @app.route('/rss/ai-news', methods=['GET'])
-def miniflux_ai_news():
-    """miniflux Webhook API
-    publish new feed entries to this API endpoint
-    ---
-    get:
-      description: Get rss feed
-      responses:
-        200:
-          content:
-            application/json:
-              status: string
+def miniflux_ai_news() -> Response:
     """
-    # Todo 根据需要获取最近时间内的文章，或总结后的列表
+    AI News RSS Feed endpoint
+    
+    Generates an RSS feed containing daily AI-generated news summaries.
+    Loads news content from temporary data file, generates RSS feed with
+    welcome entry and daily news entry, then clears the data file.
+    
+    Returns:
+        Response: RSS XML feed content
+        
+    Raises:
+        500: If feed generation fails
+    """
     try:
-        with open('ai_news.json', 'r') as file:
-            ai_news = json.load(file)
-    except FileNotFoundError:
-        ai_news = ''
+        logger.info('Generating AI news RSS feed')
+        
+        ai_news_content = _load_news_content()
+        feed_generator = _create_base_feed()
+        _add_welcome_entry(feed_generator)
+        
+        if ai_news_content:
+            _add_news_entry(feed_generator, ai_news_content)
+        else:
+            logger.warning('No news content available, RSS feed contains only welcome entry')
+            
+        rss_content = feed_generator.rss_str(pretty=True)
+
+        return rss_content
+        
     except Exception as e:
-        logger.error(e)
-
-    # 清空 ai_news.json
-    with open('ai_news.json', 'w') as file:
-        json.dump('', file, indent=4, ensure_ascii=False)
+        logger.error(f'Failed to generate AI news RSS feed: {e}')
+        logger.error(traceback.format_exc())
+        raise
 
 
-    fg = FeedGenerator()
-    fg.id('https://ai-news.miniflux')
-    fg.title('֎Newsᴬᴵ for you')
-    fg.subtitle('Powered by miniflux-ai')
-    fg.author({'name': 'miniflux-ai'})
-    fg.link(href='https://ai-news.miniflux', rel='self')
+def _load_news_content() -> str:
+    """
+    Load AI news content from data file and clear it
+    
+    Returns:
+        str: News content if available, empty string if file not found or empty
+        
+    Raises:
+        Exception: If file operations fail
+    """
+    try:
+        logger.debug(f'Loading news content from {AI_NEWS_FILE}')
+        
+        if not AI_NEWS_FILE.exists():
+            logger.warning('News content file does not exist')
+            return ''
 
-    fe_welcome = fg.add_entry()
-    fe_welcome.id('https://ai-news.miniflux')
-    fe_welcome.link(href='https://ai-news.miniflux')
-    fe_welcome.title(f"Welcome to Newsᴬᴵ")
-    fe_welcome.description(markdown.markdown('Welcome to Newsᴬᴵ'))
+        content = AI_NEWS_FILE.read_text('utf-8')
 
-    if ai_news:
-        fe = fg.add_entry()
-        fe.id('https://ai-news.miniflux' + time.strftime('%Y-%m-%d-%H-%M'))
-        fe.link(href='https://ai-news.miniflux' + time.strftime('%Y-%m-%d-%H-%M'))
-        fe.title(f"{'Morning' if datetime.today().hour < 12 else 'Nightly'} Newsᴬᴵ for you - {time.strftime('%Y-%m-%d')}")
-        fe.description(markdown.markdown(ai_news))
+        logger.debug(f'Successfully loaded news content: {len(content)} characters')
+        return content if content else ''
+        
+    except Exception as e:
+        logger.error(f'Failed to load news content: {e}')
+        raise
+    finally:
+        AI_NEWS_FILE.write_text('', encoding='utf-8')
 
-    result = fg.rss_str(pretty=True)
-    return result
+
+def _create_base_feed() -> FeedGenerator:
+    """
+    Create and configure the base RSS feed generator
+    
+    Returns:
+        FeedGenerator: Configured feed generator with base settings
+    """
+    feed_generator = FeedGenerator()
+    feed_generator.id('https://ai-news.miniflux')
+    feed_generator.title('֎Newsᴬᴵ for you')
+    feed_generator.subtitle('Powered by miniflux-ai')
+    feed_generator.author({'name': 'miniflux-ai'})
+    feed_generator.link(href='https://ai-news.miniflux', rel='self')
+    return feed_generator
+
+
+def _add_welcome_entry(feed_generator: FeedGenerator) -> None:
+    """
+    Add welcome entry to the RSS feed
+    
+    Args:
+        feed_generator: Feed generator to add entry to
+    """
+    welcome_entry = feed_generator.add_entry()
+    welcome_entry.id('https://ai-news.miniflux')
+    welcome_entry.link(href='https://ai-news.miniflux')
+    welcome_entry.title('Welcome to Newsᴬᴵ')
+    welcome_entry.description('Welcome to Newsᴬᴵ')
+
+
+def _add_news_entry(feed_generator: FeedGenerator, news_content: str) -> None:
+    """
+    Add daily news entry to the RSS feed
+    
+    Args:
+        feed_generator: Feed generator to add entry to
+        news_content: News content in markdown format
+    """
+    logger.debug('Adding daily news entry to RSS feed')
+    
+    timestamp = time.strftime('%Y-%m-%d-%H-%M')
+    date_str = time.strftime('%Y-%m-%d')
+    time_period = 'Morning' if datetime.today().hour < 12 else 'Nightly'
+    
+    news_entry = feed_generator.add_entry()
+    news_entry.id(f'https://ai-news.miniflux/{timestamp}')
+    news_entry.link(href=f'https://ai-news.miniflux/{timestamp}')
+    news_entry.title(f'{time_period} Newsᴬᴵ for you - {date_str}')
+    news_entry.description(markdown.markdown(news_content))
+    
+    logger.info(f'Successfully added {time_period.lower()} news entry for {date_str}')
