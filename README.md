@@ -57,7 +57,7 @@ The repository includes a template configuration file: `config.sample.yml`. Modi
 - **Miniflux**: Base URL and API key.
 - **LLM**: Model settings, API key, and endpoint.Add timeout, max_workers parameters due to multithreading
 - **AI News**: Schedule and prompts for daily news generation
-- **Agents**: Define each agent's prompt, allow_list/deny_list filters, and output style（`style_block` parameter controls whether the output is formatted as a code block in Markdown）.
+- **Agents**: Define each agent's prompt, allow_list/deny_list filters, and output template. The `template` parameter defines the HTML wrapper for agent output, where `${content}` is replaced with the LLM response.
 
 
 ## Docker Setup
