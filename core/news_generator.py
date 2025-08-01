@@ -31,7 +31,6 @@ def init_news_feed(miniflux_client) -> None:
             
     except Exception as e:
         logger.error(f'Failed to initialize AI news feed: {e}')
-        logger.error(traceback.format_exc())
         raise
 
 
@@ -51,7 +50,6 @@ def _create_news_feed(miniflux_client) -> None:
         
     except Exception as e:
         logger.error(f'Failed to create AI news feed in Miniflux: {e}')
-        logger.error(traceback.format_exc())
         raise
 
 
@@ -147,7 +145,6 @@ def _generate_news_content(summaries: List[Dict[str, Any]]) -> str:
         
     except Exception as e:
         logger.error(f'Failed to generate news content: {e}')
-        logger.error(traceback.format_exc())
         raise
 
 
@@ -163,7 +160,6 @@ def _save_news_content(content: str) -> None:
         
     except Exception as e:
         logger.error(f'Failed to save news content: {e}')
-        logger.error(traceback.format_exc())
         raise
 
 
@@ -188,7 +184,6 @@ def _refresh_ai_news_feed(miniflux_client) -> None:
             
     except Exception as e:
         logger.error(f'Failed to refresh AI news feed: {e}')
-        logger.error(traceback.format_exc())
         raise
 
 

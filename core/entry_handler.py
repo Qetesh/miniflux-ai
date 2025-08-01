@@ -25,7 +25,6 @@ def handle_unread_entries(miniflux_client) -> None:
     except Exception as e:
         logger.error(f"Failed to fetch and process unread entries: {e}")
         logger.error(traceback.format_exc())
-        raise
 
 
 def _fetch_entries_from_miniflux(miniflux_client) -> Optional[List[Dict[str, Any]]]:
