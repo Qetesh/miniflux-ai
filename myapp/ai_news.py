@@ -9,6 +9,10 @@ from flask import Response
 from common import logger, AI_NEWS_FILE
 from myapp import app
 
+FEED_TITLE = 'Newsᴬᴵ for you'
+FEED_LINK = 'https://ai-news.miniflux'
+
+
 @app.route('/rss/ai-news', methods=['GET'])
 def miniflux_ai_news() -> Response:
     """
@@ -27,12 +31,13 @@ def miniflux_ai_news() -> Response:
     try:
         logger.info('Generating AI news RSS feed')
         
-        ai_news_content = _load_news_content()
         feed_generator = _create_base_feed()
         _add_welcome_entry(feed_generator)
         
+        ai_news_content = _load_news_content()
         if ai_news_content:
             _add_news_entry(feed_generator, ai_news_content)
+            logger.debug(f'Successfully loaded news content: {len(ai_news_content)} characters')
         else:
             logger.warning('No news content available, RSS feed contains only welcome entry')
             
@@ -65,7 +70,6 @@ def _load_news_content() -> str:
 
         content = AI_NEWS_FILE.read_text('utf-8')
 
-        logger.debug(f'Successfully loaded news content: {len(content)} characters')
         return content if content else ''
         
     except Exception as e:
@@ -83,11 +87,11 @@ def _create_base_feed() -> FeedGenerator:
         FeedGenerator: Configured feed generator with base settings
     """
     feed_generator = FeedGenerator()
-    feed_generator.id('https://ai-news.miniflux')
-    feed_generator.title('֎Newsᴬᴵ for you')
+    feed_generator.id(FEED_LINK)
+    feed_generator.title(FEED_TITLE)
     feed_generator.subtitle('Powered by miniflux-ai')
     feed_generator.author({'name': 'miniflux-ai'})
-    feed_generator.link(href='https://ai-news.miniflux', rel='self')
+    feed_generator.link(href=FEED_LINK, rel='self')
     return feed_generator
 
 
@@ -99,8 +103,8 @@ def _add_welcome_entry(feed_generator: FeedGenerator) -> None:
         feed_generator: Feed generator to add entry to
     """
     welcome_entry = feed_generator.add_entry()
-    welcome_entry.id('https://ai-news.miniflux')
-    welcome_entry.link(href='https://ai-news.miniflux')
+    welcome_entry.id(FEED_LINK)
+    welcome_entry.link(href=FEED_LINK)
     welcome_entry.title('Welcome to Newsᴬᴵ')
     welcome_entry.description('Welcome to Newsᴬᴵ')
 
@@ -120,9 +124,9 @@ def _add_news_entry(feed_generator: FeedGenerator, news_content: str) -> None:
     time_period = 'Morning' if datetime.today().hour < 12 else 'Nightly'
     
     news_entry = feed_generator.add_entry()
-    news_entry.id(f'https://ai-news.miniflux/{timestamp}')
-    news_entry.link(href=f'https://ai-news.miniflux/{timestamp}')
-    news_entry.title(f'{time_period} Newsᴬᴵ for you - {date_str}')
+    news_entry.id(f'{FEED_LINK}/{timestamp}')
+    news_entry.link(href=f'{FEED_LINK}/{timestamp}')
+    news_entry.title(f'{time_period} {FEED_TITLE} - {date_str}')
     news_entry.description(markdown.markdown(news_content))
     
     logger.info(f'Successfully added {time_period.lower()} news entry for {date_str}')

@@ -24,10 +24,10 @@ def to_markdown(content: str) -> str:
 
 def to_html(content: str) -> str:
     """
-    Convert LLM response to HTML format
+    Convert markdown formatted content to HTML format
     
     Args:
-        response_content: Raw LLM response content
+        content: Markdown formatted content
         
     Returns:
         HTML formatted content

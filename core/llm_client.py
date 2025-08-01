@@ -8,16 +8,16 @@ llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
 
 @sleep_and_retry
 @limits(calls=config.llm_RPM, period=60)
-def get_completion(system_prompt, user_prompt):
+def get_completion(system_prompt: str, user_prompt: str) -> str:
     """
     Get completion from LLM
     
     Args:
-        system_prompt (str): System prompt for the LLM
-        user_prompt (str): User prompt for the LLM
+        system_prompt: System prompt for the LLM
+        user_prompt: User prompt for the LLM
         
     Returns:
-        str: LLM response content
+        LLM response content
     """
     messages = [
         {

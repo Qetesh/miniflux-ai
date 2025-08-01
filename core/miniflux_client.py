@@ -1,9 +1,10 @@
 import time
 import miniflux
+import traceback
 from common import config, logger
 
 
-def _create_miniflux_client():
+def _init_miniflux_client():
     """
     Create and test Miniflux client connection
     
@@ -20,10 +21,10 @@ def _create_miniflux_client():
             break
         except Exception as e:
             logger.error(f'Cannot connect to Miniflux: {e}')
-            logger.error(e.args[0].content)
+            logger.error(traceback.format_exc())
             time.sleep(3)
     
     return client
 
 
-miniflux_client = _create_miniflux_client()
+miniflux_client = _init_miniflux_client()

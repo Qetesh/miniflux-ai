@@ -28,11 +28,15 @@ def miniflux_ai():
         _verify_webhook_signature()
 
         event_type = request.headers.get('X-Miniflux-Event-Type')
+        logger.debug(f'Webhook event type: {event_type}')
+        
         if event_type not in ['new_entries']:
+            logger.debug(f'Webhook event type not supported: {event_type}')
             return jsonify({'status': 'ok'})
 
         # Parse and prepare entries data from webhook request
         entries_data = request.json
+        logger.debug(f'Webhook request: {entries_data}')
         entries_list = entries_data['entries']
         feed_info = entries_data['feed']
         
@@ -63,6 +67,9 @@ def _verify_webhook_signature() -> None:
     webhook_secret = config.miniflux_webhook_secret
     payload = request.get_data()
     signature = request.headers.get('X-Miniflux-Signature')
+
+    if not webhook_secret or not signature:
+        abort(403)
     
     hmac_signature = hmac.new(webhook_secret.encode(), payload, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(hmac_signature, signature):

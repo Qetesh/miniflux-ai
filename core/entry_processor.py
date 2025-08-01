@@ -106,7 +106,8 @@ def _process_with_single_agent(agent: tuple, entry: Dict[str, Any]) -> str:
         agent_content = _get_agent_content(agent, entry)
         log_entry_info(entry, agent_name=agent_name, message=f'Result: {agent_content}', include_title=True)
 
-        if agent_name == 'summary':
+        if config.ai_news_schedule and agent_name == 'summary':
+            # save summary to file for ai_news feature
             _save_summary_entry(entry, agent_content)
 
         formatted_result = _format_agent_result(agent_config, agent_content)

@@ -8,6 +8,8 @@ from common.logger import logger
 from common import config, SUMMARY_FILE_LOCK, SUMMARY_FILE, AI_NEWS_FILE
 from core.llm_client import get_completion
 
+FEED_NAME = 'Newsᴬᴵ for you'
+
 
 def init_news_feed(miniflux_client) -> None:
     """
@@ -23,7 +25,6 @@ def init_news_feed(miniflux_client) -> None:
         ai_news_feed_id = _find_news_feed_id(feeds)
         
         if ai_news_feed_id is None:
-            logger.info('AI news feed not found, creating new feed')
             _create_news_feed(miniflux_client)
         else:
             logger.debug(f'AI news feed already exists with ID: {ai_news_feed_id}')
@@ -46,7 +47,7 @@ def _create_news_feed(miniflux_client) -> None:
         logger.debug(f'Creating AI news feed with URL: {feed_url}')
         
         miniflux_client.create_feed(category_id=1, feed_url=feed_url)
-        logger.info('Successfully created AI news feed in Miniflux')
+        logger.info(f'Successfully created AI news feed in Miniflux: {feed_url}')
         
     except Exception as e:
         logger.error(f'Failed to create AI news feed in Miniflux: {e}')
@@ -101,8 +102,7 @@ def _load_summaries() -> List[Dict[str, Any]]:
             with open(SUMMARY_FILE, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
                 summaries = [json.loads(line) for line in lines if line.strip()]
-            
-            logger.debug(f'Successfully loaded {len(summaries)} summaries')
+
             return summaries
             
         except Exception as e:
@@ -202,12 +202,8 @@ def _find_news_feed_id(feeds: List[Dict[str, Any]]) -> Optional[int]:
     Returns:
         Feed ID if found, None otherwise
     """
-    try:
-        for feed in feeds:
-            if 'Newsᴬᴵ for you' in feed.get('title', ''):
-                return feed['id']
-        return None
+    for feed in feeds:
+        if FEED_NAME in feed.get('title', ''):
+            return feed['id']
+    return None
         
-    except Exception as e:
-        logger.error(f'Error searching for AI news feed: {e}')
-        return None 

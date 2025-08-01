@@ -41,7 +41,8 @@ def _fetch_entries_from_miniflux(miniflux_client) -> Optional[List[Dict[str, Any
     try:
         logger.info("Starting to fetch unread entries")
 
-        response = miniflux_client.get_entries(status=['unread'], limit=10000, order='id', direction='desc')
+        # ascending order can have better logs for viewing the changes
+        response = miniflux_client.get_entries(status=['unread'], limit=10000, order='id', direction='asc')
         entries = response.get('entries', [])
         
         logger.info(f'Found {len(entries)} unread entries')

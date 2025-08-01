@@ -32,8 +32,6 @@ class Config:
     def _validate_config_compatibility(self):
         """
         Validate config file version compatibility.
-        This is a breaking change - old config format is no longer supported.
-        If any agent is missing template field, it indicates old config format.
         """
         if not self.agents:
             return
