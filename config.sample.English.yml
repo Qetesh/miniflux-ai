@@ -1,6 +1,9 @@
 # INFO、DEBUG、WARN、ERROR
 log_level: "INFO"
 
+# Skip entries before this unix timestamp to avoid reprocessing during migration (optional)
+# entry_since: 1704067200  # Unix timestamp, 2024-01-01 00:00:00 UTC, get current timestamp: date +%s
+
 miniflux:
   base_url: https://your.server.com
   api_key: Miniflux_API_key_here

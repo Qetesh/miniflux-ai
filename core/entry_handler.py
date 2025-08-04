@@ -41,7 +41,19 @@ def _fetch_entries_from_miniflux(miniflux_client) -> Optional[List[Dict[str, Any
         logger.info("Starting to fetch unread entries")
 
         # ascending order can have better logs for viewing the changes
-        response = miniflux_client.get_entries(status=['unread'], limit=10000, order='id', direction='asc')
+        kwargs = {
+            'status': ['unread'],
+            'limit': 10000,
+            'order': 'id',
+            'direction': 'asc'
+        }
+        
+        # Add after parameter if entry_since is configured
+        if config.entry_since > 0:
+            kwargs['after'] = config.entry_since
+            logger.debug(f"Filtering entries after timestamp: {config.entry_since}")
+        
+        response = miniflux_client.get_entries(**kwargs)
         entries = response.get('entries', [])
         
         logger.info(f'Found {len(entries)} unread entries')

@@ -6,6 +6,7 @@ class Config:
     def __init__(self):
         self.c = safe_load(open('config.yml', encoding='utf8'))
         self.log_level = self.c.get('log_level', 'INFO')
+        self.entry_since = self.c.get('entry_since', 0)
 
         self.miniflux_base_url = self._get_config_value('miniflux', 'base_url', None)
         self.miniflux_api_key = self._get_config_value('miniflux', 'api_key', None)

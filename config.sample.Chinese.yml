@@ -1,6 +1,9 @@
 # INFO、DEBUG、WARN、ERROR
 log_level: "INFO"
 
+# 跳过此Unix时间戳之前的条目，避免版本迁移时重复处理 (可选)
+# entry_since: 1704067200  # Unix时间戳，2024-01-01 00:00:00 UTC，获取当前时间戳: date +%s
+
 miniflux:
   base_url: https://your.server.com
   api_key: Miniflux_API_key_here
