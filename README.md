@@ -76,7 +76,7 @@ services:
             TZ: Asia/Shanghai
         volumes:
             - ./config.yml:/app/config.yml
-            # - ./entries.json:/app/entries.json # Provide persistent for AI news
+            # - ./ai_summaries.data:/app/ai_summaries.data # Provide persistent for AI news
 
 ```
 Refer to `config.sample.*.yml`, create `config.yml`
