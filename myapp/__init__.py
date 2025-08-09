@@ -11,3 +11,5 @@ app.config['SWAGGER'] = {
     "specs_route": "/api/docs",
 }
 swagger = Swagger(app)
+
+from myapp import webhook, ai_news
