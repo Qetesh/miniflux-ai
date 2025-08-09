@@ -51,7 +51,7 @@ def process_entry(miniflux_client, entry: Dict[str, Any]) -> tuple[str, ...]:
             miniflux_client.update_entry(entry['id'], content=final_content)
             log_entry_info(entry, message=f"Updated successfully with new agent results: {list(new_agent_results.keys())}")
         else:
-            log_entry_info(entry, message="No new agent results generated, entry unchanged")
+            log_entry_debug(entry, message="No new agent results generated, entry unchanged")
 
         return tuple(new_agent_results.keys())
             

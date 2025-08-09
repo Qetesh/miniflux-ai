@@ -1,12 +1,12 @@
-import concurrent.futures
-import time
-
+import threading
 import schedule
+import signal
 
 from common import config, logger
 from myapp import app
 from core import handle_unread_entries, generate_daily_news, init_news_feed, miniflux_client
 
+shutdown_event = threading.Event()
 
 def my_schedule():
     interval = 15 if config.miniflux_webhook_secret else 1
@@ -18,17 +18,24 @@ def my_schedule():
         for ai_schedule in config.ai_news_schedule:
             schedule.every().day.at(ai_schedule).do(generate_daily_news, miniflux_client)
 
-    while True:
+    while not shutdown_event.is_set():
         schedule.run_pending()
-        time.sleep(1)
-
+        shutdown_event.wait(1)
 
 def my_flask():
-    logger.info('Starting API')
     app.run(host='0.0.0.0', port=80)
 
-
 if __name__ == '__main__':
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(my_flask)
-        executor.submit(my_schedule)
+    logger.info("Application starting...")
+
+    signal.signal(signal.SIGINT, lambda s, f: shutdown_event.set())
+    signal.signal(signal.SIGTERM, lambda s, f: shutdown_event.set())
+
+    flask_thread = threading.Thread(target=my_flask, daemon=True)
+    schedule_thread = threading.Thread(target=my_schedule, daemon=False)
+    
+    flask_thread.start()
+    schedule_thread.start()
+    schedule_thread.join()
+
+    logger.info("Application stopped...")

@@ -4,7 +4,9 @@ from yaml import safe_load
 
 class Config:
     def __init__(self):
-        self.c = safe_load(open('config.yml', encoding='utf8'))
+        with open('config.yml', encoding='utf8') as f:
+            self.c = safe_load(f)
+        
         self.log_level = self.c.get('log_level', 'INFO')
         self.entry_since = self.c.get('entry_since', 0)
 
