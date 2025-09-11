@@ -7,7 +7,7 @@ from common.config import Config
 from core.get_ai_result import get_ai_result
 
 config = Config()
-llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
+llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key, timeout=config.llm_timeout)
 
 def generate_daily_news(miniflux_client):
     logger.info('Generating daily news')

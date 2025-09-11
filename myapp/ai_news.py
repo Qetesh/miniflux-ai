@@ -11,7 +11,7 @@ from common.config import Config
 from myapp import app
 
 config = Config()
-llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
+llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key, timeout=config.llm_timeout)
 
 @app.route('/rss/ai-news', methods=['GET'])
 def miniflux_ai_news():
