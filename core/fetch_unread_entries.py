@@ -11,6 +11,9 @@ def fetch_unread_entries(config, miniflux_client):
     start_time = time.time()
     logger.info('Get unread entries: ' + str(len(entries['entries']))) if len(entries['entries']) > 0 else logger.info('No new entries')
 
+    if not entries['entries']:
+        return
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=config.llm_max_workers) as executor:
         futures = [executor.submit(process_entry, miniflux_client, entry) for entry in entries['entries']]
         for future in concurrent.futures.as_completed(futures):
