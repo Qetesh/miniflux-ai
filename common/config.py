@@ -8,6 +8,7 @@ class Config:
         self.miniflux_base_url = self.get_config_value('miniflux', 'base_url', None)
         self.miniflux_api_key = self.get_config_value('miniflux', 'api_key', None)
         self.miniflux_webhook_secret = self.get_config_value('miniflux', 'webhook_secret', None)
+        self.miniflux_schedule_interval = self.get_config_value('miniflux', 'schedule_interval', None)
 
         self.llm_base_url = self.get_config_value('llm', 'base_url', None)
         self.llm_api_key = self.get_config_value('llm', 'api_key', None)

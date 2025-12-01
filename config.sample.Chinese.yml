@@ -4,6 +4,9 @@ log_level: "INFO"
 miniflux:
   base_url: https://your.server.com
   api_key: Miniflux_API_key_here
+  # 查询API的间隔时间（单位分钟）
+  # 如果没有配置webhook_secret，默认1分钟，如果配置webhook_secret，默认15分钟，而使用schedule_interval则强制按此时间间隔轮询
+  # schedule_interval: 15
   # webhook_secret: Miniflux_webhook_secret_here
 
 llm:

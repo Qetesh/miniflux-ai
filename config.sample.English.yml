@@ -4,6 +4,9 @@ log_level: "INFO"
 miniflux:
   base_url: https://your.server.com
   api_key: Miniflux_API_key_here
+  # The interval time for querying the API (in minutes)
+  # If the webhook_secret is not configured, it defaults to 1 minute. If the webhook_secret is configured, it defaults to 15 minutes. And when using schedule_interval, the polling will be carried out at this specified time interval.
+  # schedule_interval: 15
   # webhook_secret: Miniflux_webhook_secret_here
 
 llm:

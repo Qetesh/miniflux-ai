@@ -6,6 +6,7 @@ This project integrates with Miniflux to fetch RSS feed content via API or webho
 ## Features
 
 - **Miniflux Integration**: Seamlessly fetch unread entries from Miniflux or trigger via webhook.
+- **Schedule Interval**: Specifies the time interval for requesting the miniflux api.
 - **LLM Processing**: Generate summaries, translations, etc. based on your chosen LLM agent.
 - **AI News**: Use the LLM agent to generate AI morning and evening news from feed content.
 - **Flexible Configuration**: Easily modify or add new agents via the `config.yml` file.
