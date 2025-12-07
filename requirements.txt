@@ -6,5 +6,4 @@ PyYAML
 flask
 feedgen
 schedule
-flasgger
 ratelimit
