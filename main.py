@@ -22,7 +22,10 @@ while True:
         time.sleep(3)
 
 def my_schedule():
-    interval = 15 if config.miniflux_webhook_secret else 1
+    if config.miniflux_schedule_interval:
+        interval = config.miniflux_schedule_interval
+    else:
+        interval = 15 if config.miniflux_webhook_secret else 1
     schedule.every(interval).minutes.do(fetch_unread_entries, config, miniflux_client)
     schedule.run_all()
 
@@ -38,8 +41,13 @@ def my_schedule():
             schedule.every().day.at(ai_schedule).do(generate_daily_news, miniflux_client)
 
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except Exception as e:
+            logger.error(f"An error occurred in the schedule loop: {e}")
+            logger.error(traceback.format_exc())
+            time.sleep(30)
 
 def my_flask():
     logger.info('Starting API')
