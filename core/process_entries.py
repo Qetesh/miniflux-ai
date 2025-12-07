@@ -42,10 +42,10 @@ def process_entry(miniflux_client, entry):
 
                 response_content = completion.choices[0].message.content
             except Exception as e:
-                logger.error(f"Error processing entry {entry['title']} with agent {agent[0]}: {e}")
+                logger.error(f"Error processing entry {entry['id']} with agent {agent[0]}: {e}")
                 continue
-            
-            logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
+            log_content = (response_content or "")[:20] + '...' if len(response_content) > 20 else response_content
+            logger.info(f"agents:{agent[0]} feed_id:{entry['id']} result:{log_content}")
 
             # save for ai_summary
             if agent[0] == 'summary':

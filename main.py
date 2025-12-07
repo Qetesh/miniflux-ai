@@ -39,6 +39,7 @@ def my_schedule():
                 logger.error('Failed to create the ai_news feed in Miniflux: %s' % e)
         for ai_schedule in config.ai_news_schedule:
             schedule.every().day.at(ai_schedule).do(generate_daily_news, miniflux_client)
+            logger.info(f"Successfully added the ai_news schedule: {ai_schedule}")
 
     while True:
         try:
