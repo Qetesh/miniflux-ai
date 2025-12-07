@@ -18,7 +18,7 @@ while True:
         break
     except Exception as e:
         logger.error('Cannot connect to Miniflux: %s' % e)
-        logger.error(e.args[0].content)
+        # logger.error(e.args[0].content)
         time.sleep(3)
 
 def my_schedule():

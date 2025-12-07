@@ -33,13 +33,18 @@ def process_entry(miniflux_client, entry):
                     {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content'])}
                 ]
 
-            completion = llm_client.chat.completions.create(
-                model=config.llm_model,
-                messages= messages,
-                timeout=config.llm_timeout
-            )
+            try:
+                completion = llm_client.chat.completions.create(
+                    model=config.llm_model,
+                    messages= messages,
+                    timeout=config.llm_timeout
+                )
 
-            response_content = completion.choices[0].message.content
+                response_content = completion.choices[0].message.content
+            except Exception as e:
+                logger.error(f"Error processing entry {entry['title']} with agent {agent[0]}: {e}")
+                continue
+            
             logger.info(f"agents:{agent[0]} feed_title:{entry['title']} result:{response_content}")
 
             # save for ai_summary

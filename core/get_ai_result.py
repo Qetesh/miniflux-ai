@@ -16,11 +16,15 @@ def get_ai_result(prompt, request):
         }
     ]
 
-    completion = llm_client.chat.completions.create(
-        model=config.llm_model,
-        messages=messages,
-        timeout=config.llm_timeout
-    )
+    try:
+        completion = llm_client.chat.completions.create(
+            model=config.llm_model,
+            messages=messages,
+            timeout=config.llm_timeout
+        )
 
-    response_content = completion.choices[0].message.content
-    return response_content
+        response_content = completion.choices[0].message.content
+        return response_content
+    except Exception as e:
+        from common.logger import logger
+        logger.error(f"Error in get_ai_result: {e}")
