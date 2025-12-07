@@ -49,7 +49,13 @@ def process_entry(miniflux_client, entry):
 
             # save for ai_summary
             if agent[0] == 'summary':
-                entry_list = {'datetime': entry['created_at'], 'category': entry['feed']['category']['title'], 'title': entry['title'], 'content': response_content}
+                entry_list = {
+                    'datetime': entry['created_at'],
+                    'category': entry['feed']['category']['title'],
+                    'title': entry['title'],
+                    'content': response_content,
+                    'url': entry['url']
+                }
                 with file_lock:
                     try:
                         with open('entries.json', 'r') as file:
