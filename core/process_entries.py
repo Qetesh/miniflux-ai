@@ -44,7 +44,7 @@ def process_entry(miniflux_client, entry):
             except Exception as e:
                 logger.error(f"Error processing entry {entry['id']} with agent {agent[0]}: {e}")
                 continue
-            log_content = (response_content or "")[:20] + '...' if len(response_content) > 20 else response_content
+            log_content = (response_content or "")[:20] + '...' if len(response_content or "") > 20 else response_content
             logger.info(f"agents:{agent[0]} feed_id:{entry['id']} result:{log_content}")
 
             # save for ai_summary
@@ -67,10 +67,10 @@ def process_entry(miniflux_client, entry):
                         json.dump(data, file, indent=4, ensure_ascii=False)
 
             if agent[1]['style_block']:
-                llm_result = (llm_result + '<pre style="white-space: pre-wrap;"><code>\n'
-                              + agent[1]['title']
+                llm_result = (llm_result + '<blockquote>\n  <p><strong>'
+                              + agent[1]['title'] + '</strong> '
                               + response_content.replace('\n', '').replace('\r', '')
-                              + '\n</code></pre><hr><br />')
+                              + '\n</p>\n</blockquote><br/>')
             else:
                 llm_result = llm_result + f"{agent[1]['title']}{markdown.markdown(response_content)}<hr><br />"
 
