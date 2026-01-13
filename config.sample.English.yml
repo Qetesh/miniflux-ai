@@ -20,6 +20,7 @@ llm:
   base_url: http://host.docker.internal:11434/v1
   api_key: ollama
   model: llama3.1:latest
+  # max_length: 10000
   # timeout: 60
   # Request per second limit, default 4
   # max_workers: 4

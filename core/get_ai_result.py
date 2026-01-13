@@ -18,6 +18,9 @@ elif config.llm_provider == "gemini":
 
 
 def get_ai_result(prompt: str, request: str):
+    if config.llm_max_length and len(request) > config.llm_max_length:
+        request = request[: config.llm_max_length]
+
     if config.llm_provider == "gemini":
         try:
             if "${content}" in prompt:
