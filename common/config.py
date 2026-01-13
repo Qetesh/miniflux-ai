@@ -10,6 +10,7 @@ class Config:
         self.miniflux_webhook_secret = self.get_config_value('miniflux', 'webhook_secret', None)
         self.miniflux_schedule_interval = self.get_config_value('miniflux', 'schedule_interval', None)
 
+        self.llm_provider = self.get_config_value('llm', 'provider', 'openai')
         self.llm_base_url = self.get_config_value('llm', 'base_url', None)
         self.llm_api_key = self.get_config_value('llm', 'api_key', None)
         self.llm_model = self.get_config_value('llm', 'model', None)
