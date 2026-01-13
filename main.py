@@ -56,5 +56,6 @@ def my_flask():
 
 if __name__ == '__main__':
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(my_flask)
+        if config.ai_news_schedule:
+            executor.submit(my_flask)
         executor.submit(my_schedule)
