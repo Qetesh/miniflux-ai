@@ -1,16 +1,14 @@
 import json
 import markdown
-from markdownify import markdownify as md
-from openai import OpenAI
 from ratelimit import limits, sleep_and_retry
 import threading
 
 from common.config import Config
 from common.logger import logger
 from core.entry_filter import filter_entry
+from core.get_ai_result import get_ai_result
 
 config = Config()
-llm_client = OpenAI(base_url=config.llm_base_url, api_key=config.llm_api_key)
 file_lock = threading.Lock()
 
 @sleep_and_retry
@@ -22,27 +20,13 @@ def process_entry(miniflux_client, entry):
     for agent in config.agents.items():
         # filter, if AI is not generating, and in allow_list, or not in deny_list
         if filter_entry(config, agent, entry):
-            if '${content}' in agent[1]['prompt']:
-                messages = [
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": agent[1]['prompt'].replace('${content}', md(entry['content']))}
-                ]
-            else:
-                messages = [
-                    {"role": "system", "content": agent[1]['prompt']},
-                    {"role": "user", "content": "The following is the input content:\n---\n " + md(entry['content'])}
-                ]
 
             try:
-                completion = llm_client.chat.completions.create(
-                    model=config.llm_model,
-                    messages= messages,
-                    timeout=config.llm_timeout
-                )
-
-                response_content = completion.choices[0].message.content
+                response_content = get_ai_result(agent[1]["prompt"], entry["content"])
             except Exception as e:
-                logger.error(f"Error processing entry {entry['id']} with agent {agent[0]}: {e}")
+                logger.error(
+                    f"Error processing entry {entry['id']} with agent {agent[0]}: {e}"
+                )
                 continue
             log_content = (response_content or "")[:20] + '...' if len(response_content or "") > 20 else response_content
             logger.info(f"agents:{agent[0]} feed_id:{entry['id']} result:{log_content}")

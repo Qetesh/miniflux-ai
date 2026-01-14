@@ -10,9 +10,17 @@ miniflux:
   # webhook_secret: Miniflux_webhook_secret_here
 
 llm:
+  # provider: gemini # openai （默认） 或 gemini
+
+  # Gemini 例子
+  # base_url: http://host.docker.internal:11434/v1
+  # api_key: your_gemini_api_key
+  # model: gemini-2.5-flash
+
   base_url: http://host.docker.internal:11434/v1
   api_key: ollama
   model: llama3.1:latest
+  # max_length: 10000
   # timeout: 60
   # Request per second limit, default 4
   # max_workers: 4
