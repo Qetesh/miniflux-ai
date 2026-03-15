@@ -100,13 +100,28 @@ docker-compose up -d
 
 ## FAQ
 <details>
-<summary>If the formatting of summary content is incorrect, add the following code in Settings > Custom CSS:</summary>
+<summary> If the formatting of summary content is incorrect, add the following code in Settings > Custom CSS: </summary>
+
 ```
 pre code {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 ```
+</details>
+
+<details>
+<summary> fetcher: refusing to access private network host "xx.xx.xx.xx" </summary>
+
+Starting with Miniflux 2.2.18, `FETCHER_ALLOW_PRIVATE_NETWORKS=1` must now be enabled to access feeds hosted on a local network. See the [official release notes](https://github.com/miniflux/v2/releases/tag/2.2.18) for details.
+
+</details>
+
+<details>
+<summary> level=WARN msg="Unable to send new entries to Webhook" ... client: connection to private network is blocked: host "miniflux-ai" resolves to a non-public IP address" </summary>
+  
+Starting with Miniflux 2.2.18, `INTEGRATION_ALLOW_PRIVATE_NETWORKS=1` must now be enabled to access third-party integration services hosted on a local network. See the [official release notes](https://github.com/miniflux/v2/releases/tag/2.2.18) for details.
+
 </details>
 
 ## Contributing
