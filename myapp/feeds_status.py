@@ -1,14 +1,6 @@
-from datetime import datetime
-
-from feedgen.feed import FeedGenerator
-
 from services.feeds_status_service import (
     FEEDS_STATUS_FEED_ID,
     FEEDS_STATUS_FEED_TITLE,
-    build_error_events,
-    build_event_display_content,
-    build_event_display_link,
-    build_event_display_title,
     build_summary_entry_id,
     build_summary_entry_link,
     build_summary_entry_datetime,
@@ -17,16 +9,9 @@ from services.feeds_status_service import (
     render_failed_feeds_summary_html,
     should_render_summary_entry,
 )
+from feedgen.feed import FeedGenerator
+
 from myapp import app
-
-
-def _parse_datetime(value):
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value)
-    except ValueError:
-        return None
 
 
 @app.route("/rss/feeds-status", methods=["GET"])
@@ -51,15 +36,5 @@ def miniflux_feeds_status():
         if summary_dt:
             summary_entry.published(summary_dt)
             fg.updated(summary_dt)
-
-    for event in build_error_events(snapshot):
-        entry = fg.add_entry()
-        entry.id(event["id"])
-        entry.link(href=build_event_display_link(event))
-        entry.title(build_event_display_title(event))
-        entry.description(build_event_display_content(event))
-        published_dt = _parse_datetime(event.get("published_at"))
-        if published_dt:
-            entry.published(published_dt)
 
     return fg.rss_str(pretty=True)

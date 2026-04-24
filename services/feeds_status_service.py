@@ -128,79 +128,9 @@ def save_feeds_status_state(state, file_path=FEEDS_STATUS_FILE):
         json.dump(state, file, indent=2, ensure_ascii=False)
 
 
-def _build_event_id(feed, generated_at):
-    raw = "|".join(
-        [
-            _text(feed.get("feed_url")),
-            _text(feed.get("site_url")),
-            _text(feed.get("title")),
-            _text(generated_at),
-            str(_safe_int(feed.get("parsing_error_count"))),
-            _text(feed.get("parsing_error_message")),
-        ]
-    )
-    digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
-    date_prefix = _parse_datetime(generated_at).strftime("%Y%m%d%H%M%S") if _parse_datetime(generated_at) else "unknown"
-    return f"{FEEDS_STATUS_FEED_ID}/event/{date_prefix}/{digest}"
-
-
-def build_event_title(feed, generated_at):
-    date_text = _parse_datetime(generated_at).strftime("%Y-%m-%d") if _parse_datetime(generated_at) else _text(generated_at)
-    return f"[{date_text}] Feed Error - {feed['title']}"
-
-
-def render_event_content(feed, generated_at):
-    current_error = html.escape(_text(feed.get("parsing_error_message")) or "-")
-    current_count = _safe_int(feed.get("parsing_error_count"))
-
-    rows = [
-        ("Title", html.escape(feed["title"])),
-        ("Feed URL", _build_link(feed.get("feed_url"))),
-        ("Site URL", _build_link(feed.get("site_url"))),
-        ("Failure Count", str(current_count)),
-        ("Error Message", current_error),
-        ("Last Checked At", html.escape(_format_time(feed.get("checked_at")))),
-        ("Event Time", html.escape(_format_time(generated_at))),
-    ]
-
-    html_rows = "".join(
-        f"<tr><th style=\"text-align:left;padding:8px 12px;border:1px solid #d9e2ec;background:#f8fbff;\">{label}</th>"
-        f"<td style=\"padding:8px 12px;border:1px solid #d9e2ec;\">{value}</td></tr>"
-        for label, value in rows
-    )
-    return (
-        "<div style=\"font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;\">"
-        "<p style=\"margin:0 0 12px;color:#243b53;\">This feed is currently reporting an error. The latest details are below.</p>"
-        "<table style=\"border-collapse:collapse;width:100%;font-size:14px;color:#102a43;\">"
-        f"{html_rows}</table></div>"
-    )
-
-
-def build_error_events(current_snapshot):
-    current_feeds = (current_snapshot or {}).get("failed_feeds", [])
-    generated_at = current_snapshot.get("generated_at") if current_snapshot else _now_iso()
-
-    events = []
-
-    for feed in current_feeds:
-        events.append(
-            {
-                "id": _build_event_id(feed, generated_at),
-                "title": build_event_title(feed, generated_at),
-                "link": feed.get("feed_url") or feed.get("site_url") or FEEDS_STATUS_FEED_ID,
-                "published_at": generated_at,
-                "feed": feed,
-                "content_html": render_event_content(feed, generated_at),
-            }
-        )
-
-    return events
-
-
 def update_feeds_status_state(feeds, file_path=FEEDS_STATUS_FILE, now=None):
     failed_feeds = get_failed_feeds(feeds)
     current_snapshot = build_snapshot(failed_feeds, now)
-    current_events = build_error_events(current_snapshot)
 
     updated_state = {
         "latest_snapshot": current_snapshot,
@@ -210,7 +140,6 @@ def update_feeds_status_state(feeds, file_path=FEEDS_STATUS_FILE, now=None):
     return {
         "state": updated_state,
         "snapshot": current_snapshot,
-        "events": current_events,
     }
 
 
@@ -219,9 +148,8 @@ def collect_feeds_status(miniflux_client, file_path=FEEDS_STATUS_FILE, now=None)
     feeds = miniflux_client.get_feeds()
     result = update_feeds_status_state(feeds, file_path=file_path, now=now)
     logger.info(
-        "Collected feeds status: %s failed feeds, %s current events",
+        "Collected feeds status: %s failed feeds",
         result["snapshot"]["failed_count"],
-        len(result["events"]),
     )
     return result
 
@@ -289,8 +217,6 @@ def render_failed_feeds_summary_html(snapshot):
             "<tr>"
             f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;\">{index}</td>"
             f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;\">{html.escape(feed['title'])}</td>"
-            f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;\">{_build_link(feed.get('feed_url'))}</td>"
-            f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;\">{_build_link(feed.get('site_url'))}</td>"
             f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;text-align:center;\">{feed['parsing_error_count']}</td>"
             f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;\">{html.escape(feed['parsing_error_message'] or '-')}</td>"
             f"<td style=\"padding:10px 12px;border:1px solid #e4ebf3;white-space:nowrap;\">{html.escape(_format_time(feed.get('checked_at')))}</td>"
@@ -304,8 +230,6 @@ def render_failed_feeds_summary_html(snapshot):
         "<tr>"
         "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">#</th>"
         "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">Title</th>"
-        "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">Feed URL</th>"
-        "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">Site URL</th>"
         "<th style=\"padding:12px;text-align:center;border:1px solid #d9e2ec;\">Failure Count</th>"
         "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">Error Message</th>"
         "<th style=\"padding:12px;text-align:left;border:1px solid #d9e2ec;\">Last Checked</th>"
@@ -353,29 +277,6 @@ def build_entry_link(base_url, generated_at):
 
 def build_summary_entry_link(snapshot):
     return build_entry_link(SUMMARY_ENTRY_ID, (snapshot or {}).get("generated_at"))
-
-
-def build_event_display_title(event):
-    feed = event.get("feed")
-    published_at = event.get("published_at")
-    if feed and published_at:
-        return build_event_title(feed, published_at)
-    return event.get("title", "Feed Status Event")
-
-
-def build_event_display_link(event):
-    feed = event.get("feed") or {}
-    published_at = event.get("published_at")
-    base_link = event.get("link") or feed.get("feed_url") or feed.get("site_url") or FEEDS_STATUS_FEED_ID
-    return build_entry_link(base_link, published_at)
-
-
-def build_event_display_content(event):
-    feed = event.get("feed")
-    published_at = event.get("published_at")
-    if feed and published_at:
-        return render_event_content(feed, published_at)
-    return event.get("content_html", "")
 
 
 def resolve_feeds_status_url(base_url):

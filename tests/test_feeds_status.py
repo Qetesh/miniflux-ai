@@ -5,7 +5,6 @@ from pathlib import Path
 from urllib import error, request
 
 from services.feeds_status_service import (
-    build_event_display_link,
     build_summary_entry_id,
     build_summary_entry_link,
     build_summary_entry_datetime,
@@ -128,9 +127,7 @@ class FeedsStatusTestCase(unittest.TestCase):
             result = update_feeds_status_state([feed], file_path=state_file, now="2026-03-18T09:00:00+08:00")
 
             self.assertEqual(result["snapshot"]["failed_count"], 1)
-            self.assertEqual(len(result["events"]), 1)
-            self.assertIn("Feed Error", result["events"][0]["title"])
-            self.assertEqual(result["events"][0]["published_at"], "2026-03-18T09:00:00+08:00")
+            self.assertNotIn("events", result)
 
             persisted_state = load_feeds_status_state(state_file)
             self.assertEqual(persisted_state["latest_snapshot"]["failed_count"], 1)
@@ -154,12 +151,9 @@ class FeedsStatusTestCase(unittest.TestCase):
             second_result = update_feeds_status_state([feed], file_path=state_file, now="2026-03-19T09:00:00+08:00")
             recovered_result = update_feeds_status_state([], file_path=state_file, now="2026-03-20T09:00:00+08:00")
 
-            self.assertEqual(len(first_result["events"]), 1)
-            self.assertEqual(first_result["events"][0]["published_at"], "2026-03-18T09:00:00+08:00")
-            self.assertEqual(len(second_result["events"]), 1)
-            self.assertEqual(second_result["events"][0]["published_at"], "2026-03-19T09:00:00+08:00")
+            self.assertEqual(first_result["snapshot"]["generated_at"], "2026-03-18T09:00:00+08:00")
+            self.assertEqual(second_result["snapshot"]["generated_at"], "2026-03-19T09:00:00+08:00")
             self.assertEqual(recovered_result["snapshot"]["failed_count"], 0)
-            self.assertEqual(len(recovered_result["events"]), 0)
 
     def test_summary_entry_identity_title_and_time_use_current_snapshot(self):
         snapshot = {
@@ -177,20 +171,6 @@ class FeedsStatusTestCase(unittest.TestCase):
         self.assertTrue(should_render_summary_entry(snapshot))
         self.assertEqual(build_summary_entry_link(snapshot), "https://feeds-status.miniflux/current#date=2026-03-19")
         self.assertFalse(should_render_summary_entry(None))
-
-    def test_event_link_appends_date(self):
-        event = {
-            "link": "https://www.reutersagency.com/feed/?best-topics=world&post_type=best",
-            "published_at": "2026-03-18T09:00:00+08:00",
-            "feed": {
-                "title": "Reuters World News",
-            },
-        }
-
-        self.assertEqual(
-            build_event_display_link(event),
-            "https://www.reutersagency.com/feed/?best-topics=world&post_type=best#date=2026-03-18",
-        )
 
     def test_load_feeds_status_state_ignores_legacy_event_history(self):
         with tempfile.TemporaryDirectory() as temp_dir:
