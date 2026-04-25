@@ -26,6 +26,16 @@ llm:
   # max_workers: 4
   # Request per minute(RPM) limit, default 1000
   # RPM: 15
+  # Extra request parameters passed through to the current LLM provider request.
+  # This can be used to disable reasoning/thinking or set future parameters, for example:
+  # extra_params:
+  #   thinking_config:
+  #     thinking_budget: 0
+  # OpenAI-compatible APIs can also use extra_body:
+  # extra_params:
+  #   extra_body:
+  #     chat_template_kwargs:
+  #       enable_thinking: false
 
 ai_news:
   # for docker compose environment, use docker container_name
