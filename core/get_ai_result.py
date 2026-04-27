@@ -35,6 +35,7 @@ def get_ai_result(prompt: str, request: str):
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=instruction,
+                    **config.llm_extra_params,
                 ),
             )
             return response.text
@@ -62,7 +63,10 @@ def get_ai_result(prompt: str, request: str):
 
         try:
             completion = llm_client.chat.completions.create(
-                model=config.llm_model, messages=messages, timeout=config.llm_timeout
+                model=config.llm_model,
+                messages=messages,
+                timeout=config.llm_timeout,
+                **config.llm_extra_params,
             )
 
             response_content = completion.choices[0].message.content

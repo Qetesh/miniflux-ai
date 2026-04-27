@@ -26,6 +26,16 @@ llm:
   # max_workers: 4
   # Request per minute(RPM) limit, default 1000
   # RPM: 15
+  # 额外请求参数，会透传到当前 LLM provider 的请求方法
+  # 可用于关闭 reasoning/thinking，或传递未来新增的参数，例如：
+  # extra_params:
+  #   thinking_config:
+  #     thinking_budget: 0
+  # OpenAI 兼容接口也可使用 extra_body：
+  # extra_params:
+  #   extra_body:
+  #     chat_template_kwargs:
+  #       enable_thinking: false
 
 ai_news:
   # for docker compose environment, use docker container_name
