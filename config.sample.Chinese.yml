@@ -68,3 +68,10 @@ agents:
     deny_list:
     allow_list:
       - https://9to5mac.com/
+
+feeds_status:
+  enabled: true
+  # feeds_status 与 ai_news 共用同一个 Flask 服务，可复用相同地址
+  url: http://miniflux_ai
+  # 默认每天 09:00 执行一次
+  schedule: "09:00"

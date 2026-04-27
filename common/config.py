@@ -29,6 +29,10 @@ class Config:
         self.ai_news_schedule = self.get_config_value('ai_news', 'schedule', None)
         self.ai_news_prompts = self.get_config_value('ai_news', 'prompts', None)
 
+        self.feeds_status_enabled = self.get_config_value('feeds_status', 'enabled', False)
+        self.feeds_status_url = self.get_config_value('feeds_status', 'url', self.ai_news_url)
+        self.feeds_status_schedule = self.get_config_value('feeds_status', 'schedule', '09:00')
+
         self.agents = self.c.get('agents', {})
 
     def get_config_value(self, section, key, default=None):

@@ -1,5 +1,11 @@
 import fnmatch
 
+# Built-in deny list for internal feeds that should never be processed by any agent
+BUILTIN_DENY_LIST = [
+    'https://ai-news.miniflux',
+    'https://feeds-status.miniflux',
+]
+
 def filter_entry(config, agent, entry):
     start_with_list = [name[1]['title'] for name in config.agents.items()]
     style_block = [name[1]['style_block'] for name in config.agents.items()]
@@ -8,6 +14,10 @@ def filter_entry(config, agent, entry):
     # Todo Compatible with whitelist/blacklist parameter, to be removed
     allow_list = agent[1].get('allow_list') if agent[1].get('allow_list') is not None else agent[1].get('whitelist')
     deny_list = agent[1]['deny_list'] if agent[1].get('deny_list') is not None else agent[1].get('blacklist')
+
+    # Always block internal URLs regardless of agent config
+    if any(fnmatch.fnmatch(entry['feed']['site_url'], pattern) for pattern in BUILTIN_DENY_LIST):
+        return False
 
     # filter, if not content starts with start flag
     if not entry['content'].startswith(tuple(start_with_list)):

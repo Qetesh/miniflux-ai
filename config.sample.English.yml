@@ -69,3 +69,10 @@ agents:
     deny_list:
     allow_list:
       - https://www.xxx.com/
+
+feeds_status:
+  enabled: true
+  # feeds_status uses the same Flask service as ai_news, so the same base URL can be reused
+  url: http://miniflux_ai
+  # Default: run once per day at 09:00
+  schedule: "09:00"
