@@ -55,6 +55,14 @@ class ConfigTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.Config()
 
+    def test_max_tokens_is_loaded_separately_from_max_length(self):
+        self.write_config("llm:\n  max_length: 100\n  max_tokens: 200\n")
+
+        config = self.Config()
+
+        self.assertEqual(config.llm_max_length, 100)
+        self.assertEqual(config.llm_max_tokens, 200)
+
 
 if __name__ == "__main__":
     unittest.main()

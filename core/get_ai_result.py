@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 from common.config import Config
 from common.logger import logger
+from core.token_truncation import truncate_text_to_tokens
 
 config = Config()
 
@@ -21,14 +22,25 @@ def get_ai_result(prompt: str, request: str):
     if config.llm_max_length and len(request) > config.llm_max_length:
         request = request[: config.llm_max_length]
 
+    request_content = md(request)
+    if config.llm_max_tokens:
+        truncated_request_content = truncate_text_to_tokens(
+            request_content,
+            config.llm_max_tokens,
+            config.llm_model,
+        )
+        if truncated_request_content != request_content:
+            logger.warning("LLM request content was truncated to llm.max_tokens tokens")
+            request_content = truncated_request_content
+
     if config.llm_provider == "gemini":
         try:
             if "${content}" in prompt:
                 instruction = ["You are a helpful assistant."]
-                contents = prompt.replace("${content}", md(request))
+                contents = prompt.replace("${content}", request_content)
             else:
                 instruction = [prompt]
-                contents = "The following is the input content:\n---\n " + md(request)
+                contents = "The following is the input content:\n---\n " + request_content
 
             response = llm_client.models.generate_content(
                 model=config.llm_model,
@@ -48,7 +60,7 @@ def get_ai_result(prompt: str, request: str):
                 {"role": "system", "content": "You are a helpful assistant."},
                 {
                     "role": "user",
-                    "content": prompt.replace("${content}", md(request)),
+                    "content": prompt.replace("${content}", request_content),
                 },
             ]
         else:
@@ -57,7 +69,7 @@ def get_ai_result(prompt: str, request: str):
                 {
                     "role": "user",
                     "content": "The following is the input content:\n---\n "
-                    + md(request),
+                    + request_content,
                 },
             ]
 

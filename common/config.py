@@ -16,6 +16,7 @@ class Config:
         self.llm_api_key = self.get_config_value('llm', 'api_key', None)
         self.llm_model = self.get_config_value('llm', 'model', None)
         self.llm_max_length = self.get_config_value('llm', 'max_length', None)
+        self.llm_max_tokens = self.get_config_value('llm', 'max_tokens', None)
         self.llm_timeout = self.get_config_value('llm', 'timeout', 60)
         self.llm_max_workers = self.get_config_value('llm', 'max_workers', 4)
         self.llm_RPM = self.get_config_value('llm', 'RPM', 1000)
