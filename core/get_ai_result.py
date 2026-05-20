@@ -58,6 +58,13 @@ def get_ai_result(prompt: str, request: str):
             raise
     elif config.llm_provider == "litellm":
         import litellm
+        from litellm.exceptions import (
+            AuthenticationError,
+            BadRequestError,
+            NotFoundError,
+            RateLimitError,
+            Timeout,
+        )
 
         messages = _build_messages(prompt, request)
         kwargs = {
@@ -74,7 +81,26 @@ def get_ai_result(prompt: str, request: str):
 
         try:
             completion = litellm.completion(**kwargs)
-            return completion.choices[0].message.content
+            content = completion.choices[0].message.content
+            if content is None:
+                logger.warning("LiteLLM returned empty response content")
+                return ""
+            return content
+        except AuthenticationError as e:
+            logger.error(f"LiteLLM authentication failed (check API key): {e}")
+            raise
+        except NotFoundError as e:
+            logger.error(f"LiteLLM model not found (check model string format, e.g. 'openai/gpt-4o'): {e}")
+            raise
+        except RateLimitError as e:
+            logger.error(f"LiteLLM rate limit exceeded: {e}")
+            raise
+        except Timeout as e:
+            logger.error(f"LiteLLM request timed out: {e}")
+            raise
+        except BadRequestError as e:
+            logger.error(f"LiteLLM bad request (check model/params): {e}")
+            raise
         except Exception as e:
             logger.error(f"Error in get_ai_result (LiteLLM): {e}")
             raise
