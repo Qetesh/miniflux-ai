@@ -8,3 +8,4 @@ feedgen
 schedule
 ratelimit
 google-genai
+litellm>=1.80.0,<1.87

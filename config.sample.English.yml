@@ -10,12 +10,17 @@ miniflux:
   # webhook_secret: Miniflux_webhook_secret_here
 
 llm:
-  # provider: gemini # openai (default) or gemini
+  # provider: gemini # openai (default), gemini, or litellm
 
   # Gemini Example
   # base_url: https://generativelanguage.googleapis.com
   # api_key: your_gemini_api_key
   # model: gemini-2.5-flash
+
+  # LiteLLM Example (100+ providers: https://docs.litellm.ai/docs/providers)
+  # provider: litellm
+  # model: anthropic/claude-sonnet-4-6  # or openai/gpt-4o, groq/llama-3.3-70b-versatile, etc.
+  # api_key: your_api_key  # optional — LiteLLM reads from provider env vars (ANTHROPIC_API_KEY, etc.)
 
   base_url: http://host.docker.internal:11434/v1
   api_key: ollama
