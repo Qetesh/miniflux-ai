@@ -15,6 +15,20 @@ elif config.llm_provider == "gemini":
         http_options=types.HttpOptions(base_url=config.llm_base_url),
         api_key=config.llm_api_key,
     )
+elif config.llm_provider == "litellm":
+    llm_client = None
+
+
+def _build_messages(prompt: str, request: str):
+    if "${content}" in prompt:
+        return [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt.replace("${content}", md(request))},
+        ]
+    return [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": "The following is the input content:\n---\n " + md(request)},
+    ]
 
 
 def get_ai_result(prompt: str, request: str):
@@ -42,24 +56,30 @@ def get_ai_result(prompt: str, request: str):
         except Exception as e:
             logger.error(f"Error in get_ai_result (Gemini): {e}")
             raise
+    elif config.llm_provider == "litellm":
+        import litellm
+
+        messages = _build_messages(prompt, request)
+        kwargs = {
+            "model": config.llm_model,
+            "messages": messages,
+            "timeout": config.llm_timeout,
+            "drop_params": True,
+            **config.llm_extra_params,
+        }
+        if config.llm_api_key:
+            kwargs["api_key"] = config.llm_api_key
+        if config.llm_base_url:
+            kwargs["api_base"] = config.llm_base_url
+
+        try:
+            completion = litellm.completion(**kwargs)
+            return completion.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Error in get_ai_result (LiteLLM): {e}")
+            raise
     else:
-        if "${content}" in prompt:
-            messages = [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {
-                    "role": "user",
-                    "content": prompt.replace("${content}", md(request)),
-                },
-            ]
-        else:
-            messages = [
-                {"role": "system", "content": prompt},
-                {
-                    "role": "user",
-                    "content": "The following is the input content:\n---\n "
-                    + md(request),
-                },
-            ]
+        messages = _build_messages(prompt, request)
 
         try:
             completion = llm_client.chat.completions.create(
