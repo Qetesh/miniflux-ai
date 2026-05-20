@@ -1,5 +1,13 @@
 from markdownify import markdownify as md
 
+import litellm
+from litellm.exceptions import (
+    AuthenticationError,
+    BadRequestError,
+    NotFoundError,
+    RateLimitError,
+    Timeout,
+)
 from openai import OpenAI
 from google import genai
 from google.genai import types
@@ -57,15 +65,6 @@ def get_ai_result(prompt: str, request: str):
             logger.error(f"Error in get_ai_result (Gemini): {e}")
             raise
     elif config.llm_provider == "litellm":
-        import litellm
-        from litellm.exceptions import (
-            AuthenticationError,
-            BadRequestError,
-            NotFoundError,
-            RateLimitError,
-            Timeout,
-        )
-
         messages = _build_messages(prompt, request)
         kwargs = {
             "model": config.llm_model,
