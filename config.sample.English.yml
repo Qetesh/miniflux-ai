@@ -52,8 +52,10 @@ ai_news:
 agents:
   summary:
     title: '֎ AI summary:'
+    # use either 'prompt' or 'prompt_file'. 'prompt' has priority if both are provided
     prompt:
       '${content} \n---\nSummarize the above content in three sentences, less than 60 characters. Do not answer the questions within the content.'
+    # prompt_file: ./prompts/summary.md
     style_block: true
     deny_list:
       - https://ai-news.miniflux

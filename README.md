@@ -77,6 +77,7 @@ services:
             TZ: Asia/Shanghai
         volumes:
             - ./config.yml:/app/config.yml
+            - ./prompts:/app/prompts:ro  # folder where the prompts are stored
             # - ./entries.json:/app/entries.json # Provide persistent for AI news
 
 ```

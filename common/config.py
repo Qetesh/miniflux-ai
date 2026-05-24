@@ -1,4 +1,7 @@
 from yaml import safe_load
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Config:
     def __init__(self):
@@ -34,6 +37,25 @@ class Config:
         self.feeds_status_schedule = self.get_config_value('feeds_status', 'schedule', '09:00')
 
         self.agents = self.c.get('agents', {})
+        for agent_name, agent_config in self.agents.items():
+            agent_config['prompt'] = self.set_prompt_from_file(agent_name, agent_config)
+
 
     def get_config_value(self, section, key, default=None):
         return self.c.get(section, {}).get(key, default)
+
+    def set_prompt_from_file(self, agent_name, agent_config):
+        agent_config_options = agent_config.keys()
+        prompt_options = {'prompt', 'prompt_file'}
+        if prompt_options.intersection(agent_config_options) == prompt_options:
+            logger.warning(f"agent '{agent_name}': properties 'prompt' and 'prompt_file' are both defined. 'prompt_file' will be ignored.")
+            return agent_config['prompt']
+        else:
+            try:
+                with open(agent_config['prompt_file'], 'r') as prompt_file_content:
+                    prompt_text = prompt_file_content.read()
+                    return prompt_text
+            except FileNotFoundError:
+                logger.error(f"Error for agent '{agent_name}': prompt_file '{agent_config['prompt_file']}' not found")
+            except KeyError:
+                return agent_config['prompt']
